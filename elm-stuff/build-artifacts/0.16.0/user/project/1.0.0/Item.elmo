@@ -33,7 +33,7 @@ Elm.Item.make = function (_elm) {
    var Pin = {ctor: "Pin"};
    var view = F2(function (address,model) {
       var _p1 = model.content;
-      if (_p1.ctor === "RContent") {
+      if (_p1.ctor === "ReminderItem") {
             var _p2 = _p1._0;
             return A2($Html.div,
             _U.list([]),
@@ -112,23 +112,23 @@ Elm.Item.make = function (_elm) {
    var Model = F4(function (a,b,c,d) {
       return {content: a,pinned: b,done: c,truncated: d};
    });
-   var EContent = function (a) {
-      return {ctor: "EContent",_0: a};
+   var EmailItem = function (a) {
+      return {ctor: "EmailItem",_0: a};
    };
-   var RContent = function (a) {
-      return {ctor: "RContent",_0: a};
+   var ReminderItem = function (a) {
+      return {ctor: "ReminderItem",_0: a};
    };
    var init = function (content) {
       var _p5 = content;
-      if (_p5.ctor === "RContent") {
-            return A4(Model,RContent(_p5._0),false,false,false);
+      if (_p5.ctor === "ReminderItem") {
+            return A4(Model,ReminderItem(_p5._0),false,false,false);
          } else {
-            return A4(Model,EContent(_p5._0),false,false,true);
+            return A4(Model,EmailItem(_p5._0),false,false,true);
          }
    };
    return _elm.Item.values = {_op: _op
-                             ,RContent: RContent
-                             ,EContent: EContent
+                             ,ReminderItem: ReminderItem
+                             ,EmailItem: EmailItem
                              ,Model: Model
                              ,init: init
                              ,reminder: reminder

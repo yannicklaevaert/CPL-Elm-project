@@ -11280,7 +11280,7 @@ Elm.Item.make = function (_elm) {
    var Pin = {ctor: "Pin"};
    var view = F2(function (address,model) {
       var _p1 = model.content;
-      if (_p1.ctor === "RContent") {
+      if (_p1.ctor === "ReminderItem") {
             var _p2 = _p1._0;
             return A2($Html.div,
             _U.list([]),
@@ -11359,23 +11359,23 @@ Elm.Item.make = function (_elm) {
    var Model = F4(function (a,b,c,d) {
       return {content: a,pinned: b,done: c,truncated: d};
    });
-   var EContent = function (a) {
-      return {ctor: "EContent",_0: a};
+   var EmailItem = function (a) {
+      return {ctor: "EmailItem",_0: a};
    };
-   var RContent = function (a) {
-      return {ctor: "RContent",_0: a};
+   var ReminderItem = function (a) {
+      return {ctor: "ReminderItem",_0: a};
    };
    var init = function (content) {
       var _p5 = content;
-      if (_p5.ctor === "RContent") {
-            return A4(Model,RContent(_p5._0),false,false,false);
+      if (_p5.ctor === "ReminderItem") {
+            return A4(Model,ReminderItem(_p5._0),false,false,false);
          } else {
-            return A4(Model,EContent(_p5._0),false,false,true);
+            return A4(Model,EmailItem(_p5._0),false,false,true);
          }
    };
    return _elm.Item.values = {_op: _op
-                             ,RContent: RContent
-                             ,EContent: EContent
+                             ,ReminderItem: ReminderItem
+                             ,EmailItem: EmailItem
                              ,Model: Model
                              ,init: init
                              ,reminder: reminder
@@ -11404,6 +11404,7 @@ Elm.ItemList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Static = Elm.Static.make(_elm);
    var _op = {};
+   var Add = function (a) {    return {ctor: "Add",_0: a};};
    var SubAction = F2(function (a,b) {
       return {ctor: "SubAction",_0: a,_1: b};
    });
@@ -11428,27 +11429,25 @@ Elm.ItemList.make = function (_elm) {
       };
       return _U.update(model,{state: A2($List.map,test,model.state)});
    });
-   var update = F2(function (action,model) {
-      var _p6 = action;
-      return A3(updateItem,$Item.update(_p6._1),_p6._0,model);
-   });
    var sortItems = function (unsorted) {
       var sorter = function (item) {
-         var _p7 = item;
-         if (_p7.ctor === "RContent") {
-               return _p7._0.created;
+         var _p6 = item.content;
+         if (_p6.ctor === "ReminderItem") {
+               return _p6._0.created;
             } else {
-               return _p7._0.date;
+               return _p6._0.date;
             }
       };
       return A2($List.sortBy,sorter,unsorted);
    };
    var startItems = function () {
-      var emails = A2($List.map,$Item.EContent,$Static.emails);
-      var reminders = A2($List.map,$Item.RContent,$Static.reminders);
-      return A2($List.map,
+      var emails = A2($List.map,$Item.EmailItem,$Static.emails);
+      var reminders = A2($List.map,
+      $Item.ReminderItem,
+      $Static.reminders);
+      return sortItems(A2($List.map,
       $Item.init,
-      sortItems(A2($List.append,reminders,emails)));
+      A2($List.append,reminders,emails)));
    }();
    var Model = F2(function (a,b) {
       return {state: a,nextItemId: b};
@@ -11457,29 +11456,43 @@ Elm.ItemList.make = function (_elm) {
    var initialise = F2(function (model,noIdList) {
       initialise: while (true) {
          var temp = $List.head(noIdList);
-         var _p8 = temp;
-         if (_p8.ctor === "Nothing") {
+         var _p7 = temp;
+         if (_p7.ctor === "Nothing") {
                return model;
             } else {
                var justList = $List.tail(noIdList);
                var newModel = A2(Model,
                A2($List.append,
                model.state,
-               _U.list([{ctor: "_Tuple2",_0: model.nextItemId,_1: _p8._0}])),
+               _U.list([{ctor: "_Tuple2",_0: model.nextItemId,_1: _p7._0}])),
                model.nextItemId + 1);
-               var _p9 = justList;
-               if (_p9.ctor === "Nothing") {
+               var _p8 = justList;
+               if (_p8.ctor === "Nothing") {
                      return newModel;
                   } else {
-                     var _v6 = newModel,_v7 = _p9._0;
-                     model = _v6;
-                     noIdList = _v7;
+                     var _v5 = newModel,_v6 = _p8._0;
+                     model = _v5;
+                     noIdList = _v6;
                      continue initialise;
                   }
             }
       }
    });
    var init = A2(initialise,A2(Model,_U.list([]),0),startItems);
+   var addItem = F2(function (item,model) {
+      var items = A2($List._op["::"],
+      item,
+      A2($List.map,$Basics.snd,model.state));
+      return A2(initialise,A2(Model,_U.list([]),0),sortItems(items));
+   });
+   var update = F2(function (action,model) {
+      var _p9 = action;
+      if (_p9.ctor === "Add") {
+            return A2(addItem,_p9._0,model);
+         } else {
+            return A3(updateItem,$Item.update(_p9._1),_p9._0,model);
+         }
+   });
    return _elm.ItemList.values = {_op: _op
                                  ,Model: Model
                                  ,init: init
@@ -11487,8 +11500,10 @@ Elm.ItemList.make = function (_elm) {
                                  ,startItems: startItems
                                  ,initialise: initialise
                                  ,sortItems: sortItems
+                                 ,addItem: addItem
                                  ,updateItem: updateItem
                                  ,SubAction: SubAction
+                                 ,Add: Add
                                  ,update: update
                                  ,view: view};
 };

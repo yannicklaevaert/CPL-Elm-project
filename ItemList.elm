@@ -23,9 +23,9 @@ initEmpty : Model
 initEmpty = Model [] 0
 
 startItems : List Item.Model
-startItems = let reminders = List.map Item.RContent Static.reminders
-                 emails = List.map Item.EContent Static.emails
-             in List.map Item.init <| sortItems (List.append reminders emails)
+startItems = let reminders = List.map Item.ReminderItem Static.reminders
+                 emails = List.map Item.EmailItem Static.emails
+             in sortItems <|List.map Item.init (List.append reminders emails)
 
 initialise : Model -> List Item.Model -> Model
 initialise model noIdList =
@@ -38,25 +38,59 @@ initialise model noIdList =
                 Nothing -> newModel
                 Just rest -> initialise newModel rest
 
-sortItems : List Item.Content -> List Item.Content
+sortItems : List Item.Model -> List Item.Model
 sortItems unsorted = let sorter item =
-                        case item of
-                          Item.RContent reminder -> reminder.created
-                          Item.EContent email -> email.date
+                        case item.content of
+                          Item.ReminderItem reminder -> reminder.created
+                          Item.EmailItem email -> email.date
                      in List.sortBy sorter unsorted
 
 
+{-
+addItem : Item.Model -> Model -> Model
+addItem item model = addItemToList item model (Model [] 0)
 
---addItem : Item.Model -> Model
---addItem model =
---  Model ((model.nextCount, item) :: model.state) (model.nextCount + 1)
+addItemToList : Item.Model -> Model -> Model -> Model
+addItemToList item model accumulator =
+  let createDateItem =
+    case item.content of
+      Item.ReminderItem reminder -> reminder.created
+      Item.EmailItem email -> email.date
+  in let createDateFirstItem =
+      case ((snd (List.head model.state)).content) of
+        Item.ReminderItem firstReminder -> firstReminder.created
+        Item.EmailItem firstEmail -> firstEmail.date
+     in if createDateFirstItem >= createDateItem
+        then let newModel = Model (List.append accumulator.state (accumulator.nextItemId, item))  (nextItemId + 1)
+             in updateAfterAddToItemList newModel model
+        else let newModel = Model (List.append accumulator.state (accumulator.nextItemId, (snd (List.head model.state))))  (nextItemId + 1)
+                 toDoList = List.tail model.state
+             in addItemToList item
 
---removeItem : Model -> Model
---removeItem model =
---  { model | state = case List.tail model.state of
---                       Just l -> l
---                       Nothing -> []
---  }
+          Model (List.append model.state [(model.nextItemId, a)]) (model.nextItemId + 1)
+
+updateAfterAddToItemList : Model -> Model -> Model
+updateAfterAddToItemList accumulator notUpdated =
+  case notUpdated of
+    [] -> accumulator
+    _ -> let nextID = accumulator.nextItemId
+             nextItem = snd <| List.head notUpdated
+             toDoList = List.tail notUpdated
+         in updateAfterAddToItemList (List.append accumulator ([nextId, nextItem] (nextId + 1))) (toDoList)
+
+
+
+  Model ((model.nextCount, item) :: model.state) (model.nextCount + 1) }
+-}
+
+addItem : Item.Model -> Model -> Model
+addItem item model =
+  let items = item :: (List.map snd model.state)
+  in initialise (Model [] 0) (sortItems items)
+
+removeItem : Id -> Model -> Model
+removeItem id model =
+  let firstItem = snd (List.head model.state)
 
 updateItem : (Item.Model -> Item.Model) -> Id -> Model -> Model
 updateItem f id model =
@@ -66,15 +100,15 @@ updateItem f id model =
 -- UPDATE
 
 type Action = SubAction Id Item.Action
---              Add
+              | Add Item.Model
 --            | Remove
 --            | SubAction Id Item.Action
 
 update : Action -> Model -> Model
 update action model =
   case action of
---    Add ->
---      addItem model
+    Add item ->
+      addItem item model
 --    Remove ->
 --      removeItem model
     SubAction id action ->

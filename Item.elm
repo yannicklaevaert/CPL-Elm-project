@@ -8,22 +8,22 @@ import Static
 import List
 import String
 
-type Content = RContent Static.Reminder | EContent Static.Email
+type ItemType = ReminderItem Static.Reminder | EmailItem Static.Email
 
 type alias Model =
-  { content: Content,
+  { content: ItemType,
     pinned: Bool,
     done: Bool,
     truncated: Bool
   }
 
 
-init : Content -> Model
+init : ItemType -> Model
 init content =
   case content of
-    RContent reminder -> Model (RContent reminder) False False False
+    ReminderItem reminder -> Model (ReminderItem reminder) False False False
 
-    EContent email -> Model (EContent email) False False True
+    EmailItem email -> Model (EmailItem email) False False True
 
 reminder : Static.Reminder
 reminder = { body = "Take out the trash", created = "2016-09-30"}
@@ -71,7 +71,7 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   case model.content of
-    RContent reminder ->
+    ReminderItem reminder ->
         Html.div []
         [ Html.p [] [Html.text reminder.body]
         , Html.p []
@@ -94,7 +94,7 @@ view address model =
         ]
 
 
-    EContent email ->
+    EmailItem email ->
         Html.div []
         [ Html.p [] [Html.text <| email.title ++ " | " ++ email.from ++ " says:"]
         , let body =
