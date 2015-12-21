@@ -1,0 +1,60 @@
+Elm.Main = Elm.Main || {};
+Elm.Main.make = function (_elm) {
+   "use strict";
+   _elm.Main = _elm.Main || {};
+   if (_elm.Main.values) return _elm.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $ItemListPair = Elm.ItemListPair.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Static = Elm.Static.make(_elm);
+   var _op = {};
+   var isDefined = function (maybe) {
+      var _p0 = maybe;
+      if (_p0.ctor === "Just") {
+            return true;
+         } else {
+            return false;
+         }
+   };
+   var mailbox = $Signal.mailbox($Maybe.Nothing);
+   var state = function () {
+      var update = F2(function (action,model) {
+         var _p1 = action;
+         if (_p1.ctor === "Just") {
+               return A2($ItemListPair.update,_p1._0,model);
+            } else {
+               return model;
+            }
+      });
+      return A3($Signal.foldp,
+      update,
+      $ItemListPair.init,
+      mailbox.signal);
+   }();
+   var main = function () {
+      var view = $ItemListPair.view(A2($Signal.forwardTo,
+      mailbox.address,
+      $Maybe.Just));
+      return A2($Signal.map,view,state);
+   }();
+   var email = {from: "bossman@corporate.me"
+               ,to: "manager@corporate.me"
+               ,title: "Corporate Ipsum"
+               ,body: "Collaboratively administrate empowered markets via plug-and-play\n                 networks. Dynamically procrastinate B2C users after installed base\n                 benefits. Dramatically visualize customer directed convergence without\n                 revolutionary ROI.\n\n                 Efficiently unleash cross-media information without cross-media\n                 value. Quickly maximize timely deliverables for real-time\n                 schemas. Dramatically maintain clicks-and-mortar solutions\n                 without functional solutions.\n\n                 Completely synergize resource taxing relationships via premier\n                 niche markets. Professionally cultivate one-to-one customer\n                 service with robust ideas. Dynamically innovate\n                 resource-leveling customer service for state of the art customer\n                 service."
+               ,date: "2015-01-30"};
+   var reminder = {body: "Take out the trash"
+                  ,created: "2016-09-30"};
+   return _elm.Main.values = {_op: _op
+                             ,reminder: reminder
+                             ,email: email
+                             ,mailbox: mailbox
+                             ,isDefined: isDefined
+                             ,state: state
+                             ,main: main};
+};

@@ -1,0 +1,64 @@
+Elm.Reminder = Elm.Reminder || {};
+Elm.Reminder.make = function (_elm) {
+   "use strict";
+   _elm.Reminder = _elm.Reminder || {};
+   if (_elm.Reminder.values) return _elm.Reminder.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var pinBox = $Signal.mailbox(false);
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "Pin": return _U.update(model,{pinned: true});
+         case "Unpin": return _U.update(model,{pinned: false});
+         case "MarkAsDone": return _U.update(model,{done: true});
+         default: return _U.update(model,{done: false});}
+   });
+   var MarkTodo = {ctor: "MarkTodo"};
+   var MarkAsDone = {ctor: "MarkAsDone"};
+   var Unpin = {ctor: "Unpin"};
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.button,
+              _U.list([A2($Html$Events.onClick,pinBox.address,true)]),
+              _U.list([$Html.text("Pin")]))
+              ,A2($Html.div,
+              _U.list([]),
+              _U.list([$Html.text($Basics.toString(model))]))
+              ,A2($Html.button,
+              _U.list([A2($Html$Events.onClick,address,Unpin)]),
+              _U.list([$Html.text("Unpin")]))]));
+   });
+   var Pin = {ctor: "Pin"};
+   var init = {pinned: false
+              ,done: false
+              ,body: ""
+              ,date: {day: $Date.Mon,month: $Date.Jan,year: 2000}};
+   var Model = F4(function (a,b,c,d) {
+      return {pinned: a,done: b,body: c,date: d};
+   });
+   var Date = F3(function (a,b,c) {
+      return {day: a,month: b,year: c};
+   });
+   return _elm.Reminder.values = {_op: _op
+                                 ,Date: Date
+                                 ,Model: Model
+                                 ,init: init
+                                 ,Pin: Pin
+                                 ,Unpin: Unpin
+                                 ,MarkAsDone: MarkAsDone
+                                 ,MarkTodo: MarkTodo
+                                 ,update: update
+                                 ,pinBox: pinBox
+                                 ,view: view};
+};

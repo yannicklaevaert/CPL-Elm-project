@@ -1,0 +1,143 @@
+Elm.Item = Elm.Item || {};
+Elm.Item.make = function (_elm) {
+   "use strict";
+   _elm.Item = _elm.Item || {};
+   if (_elm.Item.values) return _elm.Item.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Static = Elm.Static.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "Pin": return _U.update(model,{pinned: true});
+         case "Unpin": return _U.update(model,{pinned: false});
+         case "MarkAsDone": return _U.update(model,{done: true});
+         case "MarkUndone": return _U.update(model,{done: false});
+         case "Truncate": return _U.update(model,{truncated: true});
+         default: return _U.update(model,{truncated: false});}
+   });
+   var DisableTruncate = {ctor: "DisableTruncate"};
+   var Truncate = {ctor: "Truncate"};
+   var MarkUndone = {ctor: "MarkUndone"};
+   var MarkAsDone = {ctor: "MarkAsDone"};
+   var Unpin = {ctor: "Unpin"};
+   var Pin = {ctor: "Pin"};
+   var view = F2(function (address,model) {
+      var _p1 = model.content;
+      if (_p1.ctor === "RContent") {
+            var _p2 = _p1._0;
+            return A2($Html.div,
+            _U.list([]),
+            _U.list([A2($Html.p,_U.list([]),_U.list([$Html.text(_p2.body)]))
+                    ,A2($Html.p,
+                    _U.list([]),
+                    _U.list([_U.eq(model.done,false) ? A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([$Html.text("Undo")]))
+                            ,_U.eq(model.pinned,false) ? A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([$Html.text("Pin")])) : A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([$Html.text("Unpin")]))]))
+                    ,A2($Html.p,
+                    _U.list([]),
+                    _U.list([$Html.text(A2($Basics._op["++"],
+                    "date: ",
+                    _p2.created))]))]));
+         } else {
+            var _p4 = _p1._0;
+            return A2($Html.div,
+            _U.list([]),
+            _U.list([A2($Html.p,
+                    _U.list([]),
+                    _U.list([$Html.text(A2($Basics._op["++"],
+                    _p4.title,
+                    A2($Basics._op["++"],
+                    " | ",
+                    A2($Basics._op["++"],_p4.from," says:"))))]))
+                    ,function () {
+                       var body = function () {
+                          var _p3 = model.truncated;
+                          if (_p3 === false) {
+                                return _p4.body;
+                             } else {
+                                return _U.cmp($String.length(_p4.body),
+                                200) > -1 ? A2($String.append,
+                                $String.fromList(A2($List.take,200,$String.toList(_p4.body))),
+                                "...") : _p4.body;
+                             }
+                       }();
+                       return A2($Html.p,_U.list([]),_U.list([$Html.text(body)]));
+                    }()
+                    ,A2($Html.p,
+                    _U.list([]),
+                    _U.list([_U.cmp($String.length(_p4.body),
+                            200) > -1 ? _U.eq(model.truncated,false) ? A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,Truncate)]),
+                            _U.list([$Html.text("Less")])) : A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,DisableTruncate)]),
+                            _U.list([$Html.text("More")])) : A2($Html.p,
+                            _U.list([]),
+                            _U.list([]))
+                            ,_U.eq(model.done,false) ? A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([$Html.text("Undo")]))
+                            ,_U.eq(model.pinned,false) ? A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([$Html.text("Pin")])) : A2($Html.button,
+                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([$Html.text("Unpin")]))]))
+                    ,A2($Html.p,
+                    _U.list([]),
+                    _U.list([$Html.text(A2($Basics._op["++"],
+                    "date: ",
+                    _p4.date))]))]));
+         }
+   });
+   var reminder = {body: "Take out the trash"
+                  ,created: "2016-09-30"};
+   var Model = F4(function (a,b,c,d) {
+      return {content: a,pinned: b,done: c,truncated: d};
+   });
+   var EContent = function (a) {
+      return {ctor: "EContent",_0: a};
+   };
+   var RContent = function (a) {
+      return {ctor: "RContent",_0: a};
+   };
+   var init = function (content) {
+      var _p5 = content;
+      if (_p5.ctor === "RContent") {
+            return A4(Model,RContent(_p5._0),false,false,false);
+         } else {
+            return A4(Model,EContent(_p5._0),false,false,true);
+         }
+   };
+   return _elm.Item.values = {_op: _op
+                             ,RContent: RContent
+                             ,EContent: EContent
+                             ,Model: Model
+                             ,init: init
+                             ,reminder: reminder
+                             ,Pin: Pin
+                             ,Unpin: Unpin
+                             ,MarkAsDone: MarkAsDone
+                             ,MarkUndone: MarkUndone
+                             ,Truncate: Truncate
+                             ,DisableTruncate: DisableTruncate
+                             ,update: update
+                             ,view: view};
+};
