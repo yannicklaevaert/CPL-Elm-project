@@ -2,9 +2,8 @@ module Main where
 
 import Html exposing ( Html )
 import Signal
---import Item
---import ItemList
-import ItemListPair
+--import ItemListPair
+import ItemFeed
 import Html.Events as E
 import Maybe
 import Static
@@ -71,7 +70,7 @@ import Static
 --       |> Signal.constant
 
 
-mailbox : Signal.Mailbox (Maybe ItemListPair.Action)
+mailbox : Signal.Mailbox (Maybe ItemFeed.Action)
 mailbox = Signal.mailbox Nothing
 
 isDefined : Maybe a -> Bool
@@ -80,15 +79,15 @@ isDefined maybe =
     Just _ -> True
     _ -> False
 
-state : Signal ItemListPair.Model
+state : Signal ItemFeed.Model
 state =
   let update action model =
         case action of
-          Just a -> ItemListPair.update a model
+          Just a -> ItemFeed.update a model
           _ -> model
-  in Signal.foldp update ItemListPair.init mailbox.signal
+  in Signal.foldp update ItemFeed.init mailbox.signal
 
 main : Signal Html
 main =
-  let view = ItemListPair.view (Signal.forwardTo mailbox.address Just)
+  let view = ItemFeed.view (Signal.forwardTo mailbox.address Just)
   in Signal.map view state

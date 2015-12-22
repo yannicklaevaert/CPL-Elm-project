@@ -7,7 +7,7 @@ Elm.Main.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $ItemListPair = Elm.ItemListPair.make(_elm),
+   $ItemFeed = Elm.ItemFeed.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -26,18 +26,15 @@ Elm.Main.make = function (_elm) {
       var update = F2(function (action,model) {
          var _p1 = action;
          if (_p1.ctor === "Just") {
-               return A2($ItemListPair.update,_p1._0,model);
+               return A2($ItemFeed.update,_p1._0,model);
             } else {
                return model;
             }
       });
-      return A3($Signal.foldp,
-      update,
-      $ItemListPair.init,
-      mailbox.signal);
+      return A3($Signal.foldp,update,$ItemFeed.init,mailbox.signal);
    }();
    var main = function () {
-      var view = $ItemListPair.view(A2($Signal.forwardTo,
+      var view = $ItemFeed.view(A2($Signal.forwardTo,
       mailbox.address,
       $Maybe.Just));
       return A2($Signal.map,view,state);

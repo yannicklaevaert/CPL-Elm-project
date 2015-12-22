@@ -11965,36 +11965,41 @@ Elm.ItemList.make = function (_elm) {
                                  ,update: update
                                  ,view: view};
 };
-Elm.ItemListPair = Elm.ItemListPair || {};
-Elm.ItemListPair.make = function (_elm) {
+Elm.ItemFeed = Elm.ItemFeed || {};
+Elm.ItemFeed.make = function (_elm) {
    "use strict";
-   _elm.ItemListPair = _elm.ItemListPair || {};
-   if (_elm.ItemListPair.values) return _elm.ItemListPair.values;
+   _elm.ItemFeed = _elm.ItemFeed || {};
+   if (_elm.ItemFeed.values) return _elm.ItemFeed.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Item = Elm.Item.make(_elm),
    $ItemList = Elm.ItemList.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var update = F2(function (action,_p0) {
-      var _p1 = _p0;
-      var _p4 = _p1._0;
-      var _p3 = _p1._1;
-      var _p2 = action;
-      if (_p2.ctor === "TodoList") {
-            return {ctor: "_Tuple2"
-                   ,_0: A2($ItemList.update,_p2._0,_p4)
-                   ,_1: _p3};
-         } else {
-            return {ctor: "_Tuple2"
-                   ,_0: _p4
-                   ,_1: A2($ItemList.update,_p2._0,_p3)};
-         }
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "TodoList": return _U.update(model,
+           {todoList: A2($ItemList.update,_p0._0,model.todoList)});
+         case "DoneList": return _U.update(model,
+           {doneList: A2($ItemList.update,_p0._0,model.doneList)});
+         case "SaveContent": return _U.update(model,
+           {reminderField: _p0._0});
+         default: return _U.update(model,{reminderDate: _p0._0});}
    });
+   var SaveDate = function (a) {
+      return {ctor: "SaveDate",_0: a};
+   };
+   var SaveContent = function (a) {
+      return {ctor: "SaveContent",_0: a};
+   };
    var DoneList = function (a) {
       return {ctor: "DoneList",_0: a};
    };
@@ -12004,31 +12009,71 @@ Elm.ItemListPair.make = function (_elm) {
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([_U.eq($List.length($Basics.fst(model).items),
+      _U.list([_U.eq($List.length(model.todoList.items),
               0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
               _U.list([]),
               _U.list([$Html.text("To do")]))
               ,A2($ItemList.view,
               A2($Signal.forwardTo,address,TodoList),
-              $Basics.fst(model))
-              ,_U.eq($List.length($Basics.snd(model).items),0) ? A2($Html.p,
+              model.todoList)
+              ,_U.eq($List.length(model.doneList.items),0) ? A2($Html.p,
               _U.list([]),
               _U.list([])) : A2($Html.h1,
               _U.list([]),
               _U.list([$Html.text("Done")]))
               ,A2($ItemList.view,
               A2($Signal.forwardTo,address,DoneList),
-              $Basics.snd(model))]));
+              model.doneList)
+              ,A2($Html.p,_U.list([]),_U.list([]))
+              ,A2($Html.h1,_U.list([]),_U.list([$Html.text("Reminder")]))
+              ,A2($Html.input,
+              _U.list([$Html$Attributes.placeholder("New Reminder")
+                      ,A3($Html$Events.on,
+                      "input",
+                      $Html$Events.targetValue,
+                      function (str) {
+                         return A2($Signal.message,address,SaveContent(str));
+                      })
+                      ,$Html$Attributes.type$("text")
+                      ,$Html$Attributes.value(model.reminderField)]),
+              _U.list([]))
+              ,A2($Html.input,
+              _U.list([$Html$Attributes.type$("date")
+                      ,A3($Html$Events.on,
+                      "input",
+                      $Html$Events.targetValue,
+                      function (date) {
+                         return A2($Signal.message,address,SaveDate(date));
+                      })
+                      ,$Html$Attributes.value(model.reminderDate)]),
+              _U.list([]))
+              ,A2($Html.button,
+              _U.list([A2($Html$Events.onClick,
+              address,
+              TodoList($ItemList.Add(A2($Item.newReminder,
+              model.reminderField,
+              model.reminderDate))))]),
+              _U.list([$Html.text("Add")]))]));
    });
-   var init = {ctor: "_Tuple2"
-              ,_0: $ItemList.init
-              ,_1: $ItemList.initEmpty};
-   return _elm.ItemListPair.values = {_op: _op
-                                     ,init: init
-                                     ,TodoList: TodoList
-                                     ,DoneList: DoneList
-                                     ,update: update
-                                     ,view: view};
+   var init = {todoList: $ItemList.init
+              ,doneList: $ItemList.initEmpty
+              ,reminderField: ""
+              ,reminderDate: "01-01-2015"};
+   var Model = F4(function (a,b,c,d) {
+      return {todoList: a
+             ,doneList: b
+             ,reminderField: c
+             ,reminderDate: d};
+   });
+   return _elm.ItemFeed.values = {_op: _op
+                                 ,Model: Model
+                                 ,init: init
+                                 ,TodoList: TodoList
+                                 ,DoneList: DoneList
+                                 ,SaveContent: SaveContent
+                                 ,SaveDate: SaveDate
+                                 ,update: update
+                                 ,view: view};
 };
 Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {
@@ -12039,7 +12084,7 @@ Elm.Main.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $ItemListPair = Elm.ItemListPair.make(_elm),
+   $ItemFeed = Elm.ItemFeed.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -12058,18 +12103,15 @@ Elm.Main.make = function (_elm) {
       var update = F2(function (action,model) {
          var _p1 = action;
          if (_p1.ctor === "Just") {
-               return A2($ItemListPair.update,_p1._0,model);
+               return A2($ItemFeed.update,_p1._0,model);
             } else {
                return model;
             }
       });
-      return A3($Signal.foldp,
-      update,
-      $ItemListPair.init,
-      mailbox.signal);
+      return A3($Signal.foldp,update,$ItemFeed.init,mailbox.signal);
    }();
    var main = function () {
-      var view = $ItemListPair.view(A2($Signal.forwardTo,
+      var view = $ItemFeed.view(A2($Signal.forwardTo,
       mailbox.address,
       $Maybe.Just));
       return A2($Signal.map,view,state);
