@@ -71,32 +71,6 @@ import Static
 --       |> Signal.constant
 
 
-reminder : Static.Reminder
-reminder = { body = "Take out the trash", created = "2016-09-30"}
-
-email : Static.Email
-email = { from = "bossman@corporate.me"
-     , to = "manager@corporate.me"
-     , title = "Corporate Ipsum"
-     , body = """Collaboratively administrate empowered markets via plug-and-play
-                 networks. Dynamically procrastinate B2C users after installed base
-                 benefits. Dramatically visualize customer directed convergence without
-                 revolutionary ROI.
-
-                 Efficiently unleash cross-media information without cross-media
-                 value. Quickly maximize timely deliverables for real-time
-                 schemas. Dramatically maintain clicks-and-mortar solutions
-                 without functional solutions.
-
-                 Completely synergize resource taxing relationships via premier
-                 niche markets. Professionally cultivate one-to-one customer
-                 service with robust ideas. Dynamically innovate
-                 resource-leveling customer service for state of the art customer
-                 service."""
-     , date = "2015-01-30"
-     }
-
---mailbox : Signal.Mailbox (Maybe Item.Action)
 mailbox : Signal.Mailbox (Maybe ItemListPair.Action)
 mailbox = Signal.mailbox Nothing
 
@@ -106,19 +80,15 @@ isDefined maybe =
     Just _ -> True
     _ -> False
 
---state : Signal Item.Model
 state : Signal ItemListPair.Model
 state =
   let update action model =
         case action of
-          --Just a -> Item.update a model
           Just a -> ItemListPair.update a model
           _ -> model
-  --in Signal.foldp update (Item.init <| Item.EContent email) mailbox.signal
   in Signal.foldp update ItemListPair.init mailbox.signal
 
 main : Signal Html
 main =
-  --let view = Item.view (Signal.forwardTo mailbox.address Just)
   let view = ItemListPair.view (Signal.forwardTo mailbox.address Just)
   in Signal.map view state

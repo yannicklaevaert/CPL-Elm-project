@@ -11,22 +11,31 @@ import String
 type ItemType = ReminderItem Static.Reminder | EmailItem Static.Email
 
 type alias Model =
-  { content: ItemType,
-    pinned: Bool,
-    done: Bool,
-    truncated: Bool
+  { itemType : ItemType,
+    pinned : Bool,
+    done : Bool,
+    truncated : Bool
   }
 
 
-init : ItemType -> Model
-init content =
-  case content of
-    ReminderItem reminder -> Model (ReminderItem reminder) False False False
+newItem : ItemType -> Model
+newItem itemType =
+  case itemType of
+    ReminderItem reminder ->
+      { itemType = (ReminderItem reminder)
+        , pinned = False
+        , done = False
+        , truncated = False
+      }
+    EmailItem email ->
+      { itemType = (EmailItem email)
+        , pinned = False
+        , done = False
+        , truncated = True
+      }
 
-    EmailItem email -> Model (EmailItem email) False False True
-
-reminder : Static.Reminder
-reminder = { body = "Take out the trash", created = "2016-09-30"}
+newReminder : String -> String -> Model
+newReminder reminderBody reminderDate = newItem (ReminderItem { body = reminderBody, created = reminderDate })
 
 --UPDATE
 
@@ -70,7 +79,7 @@ update action model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  case model.content of
+  case model.itemType of
     ReminderItem reminder ->
         Html.div []
         [ Html.p [] [Html.text reminder.body]

@@ -11120,6 +11120,437 @@ Elm.Html.make = function (_elm) {
                              ,menu: menu};
 };
 Elm.Html = Elm.Html || {};
+Elm.Html.Attributes = Elm.Html.Attributes || {};
+Elm.Html.Attributes.make = function (_elm) {
+   "use strict";
+   _elm.Html = _elm.Html || {};
+   _elm.Html.Attributes = _elm.Html.Attributes || {};
+   if (_elm.Html.Attributes.values)
+   return _elm.Html.Attributes.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $VirtualDom = Elm.VirtualDom.make(_elm);
+   var _op = {};
+   var attribute = $VirtualDom.attribute;
+   var contextmenu = function (value) {
+      return A2(attribute,"contextmenu",value);
+   };
+   var property = $VirtualDom.property;
+   var stringProperty = F2(function (name,string) {
+      return A2(property,name,$Json$Encode.string(string));
+   });
+   var $class = function (name) {
+      return A2(stringProperty,"className",name);
+   };
+   var id = function (name) {
+      return A2(stringProperty,"id",name);
+   };
+   var title = function (name) {
+      return A2(stringProperty,"title",name);
+   };
+   var accesskey = function ($char) {
+      return A2(stringProperty,
+      "accessKey",
+      $String.fromChar($char));
+   };
+   var dir = function (value) {
+      return A2(stringProperty,"dir",value);
+   };
+   var draggable = function (value) {
+      return A2(stringProperty,"draggable",value);
+   };
+   var dropzone = function (value) {
+      return A2(stringProperty,"dropzone",value);
+   };
+   var itemprop = function (value) {
+      return A2(stringProperty,"itemprop",value);
+   };
+   var lang = function (value) {
+      return A2(stringProperty,"lang",value);
+   };
+   var tabindex = function (n) {
+      return A2(stringProperty,"tabIndex",$Basics.toString(n));
+   };
+   var charset = function (value) {
+      return A2(stringProperty,"charset",value);
+   };
+   var content = function (value) {
+      return A2(stringProperty,"content",value);
+   };
+   var httpEquiv = function (value) {
+      return A2(stringProperty,"httpEquiv",value);
+   };
+   var language = function (value) {
+      return A2(stringProperty,"language",value);
+   };
+   var src = function (value) {
+      return A2(stringProperty,"src",value);
+   };
+   var height = function (value) {
+      return A2(stringProperty,"height",$Basics.toString(value));
+   };
+   var width = function (value) {
+      return A2(stringProperty,"width",$Basics.toString(value));
+   };
+   var alt = function (value) {
+      return A2(stringProperty,"alt",value);
+   };
+   var preload = function (value) {
+      return A2(stringProperty,"preload",value);
+   };
+   var poster = function (value) {
+      return A2(stringProperty,"poster",value);
+   };
+   var kind = function (value) {
+      return A2(stringProperty,"kind",value);
+   };
+   var srclang = function (value) {
+      return A2(stringProperty,"srclang",value);
+   };
+   var sandbox = function (value) {
+      return A2(stringProperty,"sandbox",value);
+   };
+   var srcdoc = function (value) {
+      return A2(stringProperty,"srcdoc",value);
+   };
+   var type$ = function (value) {
+      return A2(stringProperty,"type",value);
+   };
+   var value = function (value) {
+      return A2(stringProperty,"value",value);
+   };
+   var placeholder = function (value) {
+      return A2(stringProperty,"placeholder",value);
+   };
+   var accept = function (value) {
+      return A2(stringProperty,"accept",value);
+   };
+   var acceptCharset = function (value) {
+      return A2(stringProperty,"acceptCharset",value);
+   };
+   var action = function (value) {
+      return A2(stringProperty,"action",value);
+   };
+   var autocomplete = function (bool) {
+      return A2(stringProperty,"autocomplete",bool ? "on" : "off");
+   };
+   var autosave = function (value) {
+      return A2(stringProperty,"autosave",value);
+   };
+   var enctype = function (value) {
+      return A2(stringProperty,"enctype",value);
+   };
+   var formaction = function (value) {
+      return A2(stringProperty,"formAction",value);
+   };
+   var list = function (value) {
+      return A2(stringProperty,"list",value);
+   };
+   var minlength = function (n) {
+      return A2(stringProperty,"minLength",$Basics.toString(n));
+   };
+   var maxlength = function (n) {
+      return A2(stringProperty,"maxLength",$Basics.toString(n));
+   };
+   var method = function (value) {
+      return A2(stringProperty,"method",value);
+   };
+   var name = function (value) {
+      return A2(stringProperty,"name",value);
+   };
+   var pattern = function (value) {
+      return A2(stringProperty,"pattern",value);
+   };
+   var size = function (n) {
+      return A2(stringProperty,"size",$Basics.toString(n));
+   };
+   var $for = function (value) {
+      return A2(stringProperty,"htmlFor",value);
+   };
+   var form = function (value) {
+      return A2(stringProperty,"form",value);
+   };
+   var max = function (value) {
+      return A2(stringProperty,"max",value);
+   };
+   var min = function (value) {
+      return A2(stringProperty,"min",value);
+   };
+   var step = function (n) {
+      return A2(stringProperty,"step",n);
+   };
+   var cols = function (n) {
+      return A2(stringProperty,"cols",$Basics.toString(n));
+   };
+   var rows = function (n) {
+      return A2(stringProperty,"rows",$Basics.toString(n));
+   };
+   var wrap = function (value) {
+      return A2(stringProperty,"wrap",value);
+   };
+   var usemap = function (value) {
+      return A2(stringProperty,"useMap",value);
+   };
+   var shape = function (value) {
+      return A2(stringProperty,"shape",value);
+   };
+   var coords = function (value) {
+      return A2(stringProperty,"coords",value);
+   };
+   var challenge = function (value) {
+      return A2(stringProperty,"challenge",value);
+   };
+   var keytype = function (value) {
+      return A2(stringProperty,"keytype",value);
+   };
+   var align = function (value) {
+      return A2(stringProperty,"align",value);
+   };
+   var cite = function (value) {
+      return A2(stringProperty,"cite",value);
+   };
+   var href = function (value) {
+      return A2(stringProperty,"href",value);
+   };
+   var target = function (value) {
+      return A2(stringProperty,"target",value);
+   };
+   var downloadAs = function (value) {
+      return A2(stringProperty,"download",value);
+   };
+   var hreflang = function (value) {
+      return A2(stringProperty,"hreflang",value);
+   };
+   var media = function (value) {
+      return A2(stringProperty,"media",value);
+   };
+   var ping = function (value) {
+      return A2(stringProperty,"ping",value);
+   };
+   var rel = function (value) {
+      return A2(stringProperty,"rel",value);
+   };
+   var datetime = function (value) {
+      return A2(stringProperty,"datetime",value);
+   };
+   var pubdate = function (value) {
+      return A2(stringProperty,"pubdate",value);
+   };
+   var start = function (n) {
+      return A2(stringProperty,"start",$Basics.toString(n));
+   };
+   var colspan = function (n) {
+      return A2(stringProperty,"colSpan",$Basics.toString(n));
+   };
+   var headers = function (value) {
+      return A2(stringProperty,"headers",value);
+   };
+   var rowspan = function (n) {
+      return A2(stringProperty,"rowSpan",$Basics.toString(n));
+   };
+   var scope = function (value) {
+      return A2(stringProperty,"scope",value);
+   };
+   var manifest = function (value) {
+      return A2(stringProperty,"manifest",value);
+   };
+   var boolProperty = F2(function (name,bool) {
+      return A2(property,name,$Json$Encode.bool(bool));
+   });
+   var hidden = function (bool) {
+      return A2(boolProperty,"hidden",bool);
+   };
+   var contenteditable = function (bool) {
+      return A2(boolProperty,"contentEditable",bool);
+   };
+   var spellcheck = function (bool) {
+      return A2(boolProperty,"spellcheck",bool);
+   };
+   var async = function (bool) {
+      return A2(boolProperty,"async",bool);
+   };
+   var defer = function (bool) {
+      return A2(boolProperty,"defer",bool);
+   };
+   var scoped = function (bool) {
+      return A2(boolProperty,"scoped",bool);
+   };
+   var autoplay = function (bool) {
+      return A2(boolProperty,"autoplay",bool);
+   };
+   var controls = function (bool) {
+      return A2(boolProperty,"controls",bool);
+   };
+   var loop = function (bool) {
+      return A2(boolProperty,"loop",bool);
+   };
+   var $default = function (bool) {
+      return A2(boolProperty,"default",bool);
+   };
+   var seamless = function (bool) {
+      return A2(boolProperty,"seamless",bool);
+   };
+   var checked = function (bool) {
+      return A2(boolProperty,"checked",bool);
+   };
+   var selected = function (bool) {
+      return A2(boolProperty,"selected",bool);
+   };
+   var autofocus = function (bool) {
+      return A2(boolProperty,"autofocus",bool);
+   };
+   var disabled = function (bool) {
+      return A2(boolProperty,"disabled",bool);
+   };
+   var multiple = function (bool) {
+      return A2(boolProperty,"multiple",bool);
+   };
+   var novalidate = function (bool) {
+      return A2(boolProperty,"noValidate",bool);
+   };
+   var readonly = function (bool) {
+      return A2(boolProperty,"readOnly",bool);
+   };
+   var required = function (bool) {
+      return A2(boolProperty,"required",bool);
+   };
+   var ismap = function (value) {
+      return A2(boolProperty,"isMap",value);
+   };
+   var download = function (bool) {
+      return A2(boolProperty,"download",bool);
+   };
+   var reversed = function (bool) {
+      return A2(boolProperty,"reversed",bool);
+   };
+   var classList = function (list) {
+      return $class(A2($String.join,
+      " ",
+      A2($List.map,$Basics.fst,A2($List.filter,$Basics.snd,list))));
+   };
+   var style = function (props) {
+      return A2(property,
+      "style",
+      $Json$Encode.object(A2($List.map,
+      function (_p0) {
+         var _p1 = _p0;
+         return {ctor: "_Tuple2"
+                ,_0: _p1._0
+                ,_1: $Json$Encode.string(_p1._1)};
+      },
+      props)));
+   };
+   var key = function (k) {    return A2(stringProperty,"key",k);};
+   return _elm.Html.Attributes.values = {_op: _op
+                                        ,key: key
+                                        ,style: style
+                                        ,$class: $class
+                                        ,classList: classList
+                                        ,id: id
+                                        ,title: title
+                                        ,hidden: hidden
+                                        ,type$: type$
+                                        ,value: value
+                                        ,checked: checked
+                                        ,placeholder: placeholder
+                                        ,selected: selected
+                                        ,accept: accept
+                                        ,acceptCharset: acceptCharset
+                                        ,action: action
+                                        ,autocomplete: autocomplete
+                                        ,autofocus: autofocus
+                                        ,autosave: autosave
+                                        ,disabled: disabled
+                                        ,enctype: enctype
+                                        ,formaction: formaction
+                                        ,list: list
+                                        ,maxlength: maxlength
+                                        ,minlength: minlength
+                                        ,method: method
+                                        ,multiple: multiple
+                                        ,name: name
+                                        ,novalidate: novalidate
+                                        ,pattern: pattern
+                                        ,readonly: readonly
+                                        ,required: required
+                                        ,size: size
+                                        ,$for: $for
+                                        ,form: form
+                                        ,max: max
+                                        ,min: min
+                                        ,step: step
+                                        ,cols: cols
+                                        ,rows: rows
+                                        ,wrap: wrap
+                                        ,href: href
+                                        ,target: target
+                                        ,download: download
+                                        ,downloadAs: downloadAs
+                                        ,hreflang: hreflang
+                                        ,media: media
+                                        ,ping: ping
+                                        ,rel: rel
+                                        ,ismap: ismap
+                                        ,usemap: usemap
+                                        ,shape: shape
+                                        ,coords: coords
+                                        ,src: src
+                                        ,height: height
+                                        ,width: width
+                                        ,alt: alt
+                                        ,autoplay: autoplay
+                                        ,controls: controls
+                                        ,loop: loop
+                                        ,preload: preload
+                                        ,poster: poster
+                                        ,$default: $default
+                                        ,kind: kind
+                                        ,srclang: srclang
+                                        ,sandbox: sandbox
+                                        ,seamless: seamless
+                                        ,srcdoc: srcdoc
+                                        ,reversed: reversed
+                                        ,start: start
+                                        ,align: align
+                                        ,colspan: colspan
+                                        ,rowspan: rowspan
+                                        ,headers: headers
+                                        ,scope: scope
+                                        ,async: async
+                                        ,charset: charset
+                                        ,content: content
+                                        ,defer: defer
+                                        ,httpEquiv: httpEquiv
+                                        ,language: language
+                                        ,scoped: scoped
+                                        ,accesskey: accesskey
+                                        ,contenteditable: contenteditable
+                                        ,contextmenu: contextmenu
+                                        ,dir: dir
+                                        ,draggable: draggable
+                                        ,dropzone: dropzone
+                                        ,itemprop: itemprop
+                                        ,lang: lang
+                                        ,spellcheck: spellcheck
+                                        ,tabindex: tabindex
+                                        ,challenge: challenge
+                                        ,keytype: keytype
+                                        ,cite: cite
+                                        ,datetime: datetime
+                                        ,pubdate: pubdate
+                                        ,manifest: manifest
+                                        ,property: property
+                                        ,attribute: attribute};
+};
+Elm.Html = Elm.Html || {};
 Elm.Html.Events = Elm.Html.Events || {};
 Elm.Html.Events.make = function (_elm) {
    "use strict";
@@ -11279,7 +11710,7 @@ Elm.Item.make = function (_elm) {
    var Unpin = {ctor: "Unpin"};
    var Pin = {ctor: "Pin"};
    var view = F2(function (address,model) {
-      var _p1 = model.content;
+      var _p1 = model.itemType;
       if (_p1.ctor === "ReminderItem") {
             var _p2 = _p1._0;
             return A2($Html.div,
@@ -11354,10 +11785,8 @@ Elm.Item.make = function (_elm) {
                     _p4.date))]))]));
          }
    });
-   var reminder = {body: "Take out the trash"
-                  ,created: "2016-09-30"};
    var Model = F4(function (a,b,c,d) {
-      return {content: a,pinned: b,done: c,truncated: d};
+      return {itemType: a,pinned: b,done: c,truncated: d};
    });
    var EmailItem = function (a) {
       return {ctor: "EmailItem",_0: a};
@@ -11365,20 +11794,30 @@ Elm.Item.make = function (_elm) {
    var ReminderItem = function (a) {
       return {ctor: "ReminderItem",_0: a};
    };
-   var init = function (content) {
-      var _p5 = content;
+   var newItem = function (itemType) {
+      var _p5 = itemType;
       if (_p5.ctor === "ReminderItem") {
-            return A4(Model,ReminderItem(_p5._0),false,false,false);
+            return {itemType: ReminderItem(_p5._0)
+                   ,pinned: false
+                   ,done: false
+                   ,truncated: false};
          } else {
-            return A4(Model,EmailItem(_p5._0),false,false,true);
+            return {itemType: EmailItem(_p5._0)
+                   ,pinned: false
+                   ,done: false
+                   ,truncated: true};
          }
    };
+   var newReminder = F2(function (reminderBody,reminderDate) {
+      return newItem(ReminderItem({body: reminderBody
+                                  ,created: reminderDate}));
+   });
    return _elm.Item.values = {_op: _op
                              ,ReminderItem: ReminderItem
                              ,EmailItem: EmailItem
                              ,Model: Model
-                             ,init: init
-                             ,reminder: reminder
+                             ,newItem: newItem
+                             ,newReminder: newReminder
                              ,Pin: Pin
                              ,Unpin: Unpin
                              ,MarkAsDone: MarkAsDone
@@ -11404,6 +11843,7 @@ Elm.ItemList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Static = Elm.Static.make(_elm);
    var _op = {};
+   var Remove = function (a) {    return {ctor: "Remove",_0: a};};
    var Add = function (a) {    return {ctor: "Add",_0: a};};
    var SubAction = F2(function (a,b) {
       return {ctor: "SubAction",_0: a,_1: b};
@@ -11415,7 +11855,7 @@ Elm.ItemList.make = function (_elm) {
          A2($Signal.forwardTo,address,SubAction(_p1._0)),
          _p1._1);
       };
-      var items = A2($List.map,view$,model.state);
+      var items = A2($List.map,view$,model.items);
       return A2($Html.div,_U.list([]),items);
    });
    var updateItem = F3(function (f,id,model) {
@@ -11427,11 +11867,19 @@ Elm.ItemList.make = function (_elm) {
                 ,_0: _p4
                 ,_1: _U.eq(id,_p4) ? f(_p5) : _p5};
       };
-      return _U.update(model,{state: A2($List.map,test,model.state)});
+      return _U.update(model,{items: A2($List.map,test,model.items)});
+   });
+   var removeItem = F2(function (id,model) {
+      return _U.update(model,
+      {items: A2($List.filter,
+      function (i) {
+         return !_U.eq($Basics.fst(i),id);
+      },
+      model.items)});
    });
    var sortItems = function (unsorted) {
       var sorter = function (item) {
-         var _p6 = item.content;
+         var _p6 = item.itemType;
          if (_p6.ctor === "ReminderItem") {
                return _p6._0.created;
             } else {
@@ -11440,19 +11888,6 @@ Elm.ItemList.make = function (_elm) {
       };
       return A2($List.sortBy,sorter,unsorted);
    };
-   var startItems = function () {
-      var emails = A2($List.map,$Item.EmailItem,$Static.emails);
-      var reminders = A2($List.map,
-      $Item.ReminderItem,
-      $Static.reminders);
-      return sortItems(A2($List.map,
-      $Item.init,
-      A2($List.append,reminders,emails)));
-   }();
-   var Model = F2(function (a,b) {
-      return {state: a,nextItemId: b};
-   });
-   var initEmpty = A2(Model,_U.list([]),0);
    var initialise = F2(function (model,noIdList) {
       initialise: while (true) {
          var temp = $List.head(noIdList);
@@ -11461,11 +11896,11 @@ Elm.ItemList.make = function (_elm) {
                return model;
             } else {
                var justList = $List.tail(noIdList);
-               var newModel = A2(Model,
-               A2($List.append,
-               model.state,
-               _U.list([{ctor: "_Tuple2",_0: model.nextItemId,_1: _p7._0}])),
-               model.nextItemId + 1);
+               var newModel = _U.update(model,
+               {items: A2($Basics._op["++"],
+               model.items,
+               _U.list([{ctor: "_Tuple2",_0: model.nextItemId,_1: _p7._0}]))
+               ,nextItemId: model.nextItemId + 1});
                var _p8 = justList;
                if (_p8.ctor === "Nothing") {
                      return newModel;
@@ -11478,20 +11913,41 @@ Elm.ItemList.make = function (_elm) {
             }
       }
    });
-   var init = A2(initialise,A2(Model,_U.list([]),0),startItems);
+   var startItems = function () {
+      var emails = A2($List.map,$Item.EmailItem,$Static.emails);
+      var reminders = A2($List.map,
+      $Item.ReminderItem,
+      $Static.reminders);
+      return sortItems(A2($List.map,
+      $Item.newItem,
+      A2($List.append,reminders,emails)));
+   }();
+   var initEmpty = {items: _U.list([])
+                   ,nextItemId: 0
+                   ,visibility: "All"};
+   var Model = F3(function (a,b,c) {
+      return {items: a,nextItemId: b,visibility: c};
+   });
+   var init = A2(initialise,
+   A3(Model,_U.list([]),0,"All"),
+   startItems);
    var addItem = F2(function (item,model) {
       var items = A2($List._op["::"],
       item,
-      A2($List.map,$Basics.snd,model.state));
-      return A2(initialise,A2(Model,_U.list([]),0),sortItems(items));
+      A2($List.map,$Basics.snd,model.items));
+      return A2(initialise,
+      A3(Model,_U.list([]),0,model.visibility),
+      sortItems(items));
    });
    var update = F2(function (action,model) {
       var _p9 = action;
-      if (_p9.ctor === "Add") {
-            return A2(addItem,_p9._0,model);
-         } else {
-            return A3(updateItem,$Item.update(_p9._1),_p9._0,model);
-         }
+      switch (_p9.ctor)
+      {case "Add": return A2(addItem,_p9._0,model);
+         case "Remove": return A2(removeItem,_p9._0,model);
+         default: return A3(updateItem,
+           $Item.update(_p9._1),
+           _p9._0,
+           model);}
    });
    return _elm.ItemList.values = {_op: _op
                                  ,Model: Model
@@ -11501,9 +11957,11 @@ Elm.ItemList.make = function (_elm) {
                                  ,initialise: initialise
                                  ,sortItems: sortItems
                                  ,addItem: addItem
+                                 ,removeItem: removeItem
                                  ,updateItem: updateItem
                                  ,SubAction: SubAction
                                  ,Add: Add
+                                 ,Remove: Remove
                                  ,update: update
                                  ,view: view};
 };
@@ -11546,14 +12004,14 @@ Elm.ItemListPair.make = function (_elm) {
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([_U.eq($List.length($Basics.fst(model).state),
+      _U.list([_U.eq($List.length($Basics.fst(model).items),
               0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
               _U.list([]),
               _U.list([$Html.text("To do")]))
               ,A2($ItemList.view,
               A2($Signal.forwardTo,address,TodoList),
               $Basics.fst(model))
-              ,_U.eq($List.length($Basics.snd(model).state),0) ? A2($Html.p,
+              ,_U.eq($List.length($Basics.snd(model).items),0) ? A2($Html.p,
               _U.list([]),
               _U.list([])) : A2($Html.h1,
               _U.list([]),
@@ -11585,8 +12043,7 @@ Elm.Main.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Static = Elm.Static.make(_elm);
+   $Signal = Elm.Signal.make(_elm);
    var _op = {};
    var isDefined = function (maybe) {
       var _p0 = maybe;
@@ -11617,16 +12074,7 @@ Elm.Main.make = function (_elm) {
       $Maybe.Just));
       return A2($Signal.map,view,state);
    }();
-   var email = {from: "bossman@corporate.me"
-               ,to: "manager@corporate.me"
-               ,title: "Corporate Ipsum"
-               ,body: "Collaboratively administrate empowered markets via plug-and-play\n                 networks. Dynamically procrastinate B2C users after installed base\n                 benefits. Dramatically visualize customer directed convergence without\n                 revolutionary ROI.\n\n                 Efficiently unleash cross-media information without cross-media\n                 value. Quickly maximize timely deliverables for real-time\n                 schemas. Dramatically maintain clicks-and-mortar solutions\n                 without functional solutions.\n\n                 Completely synergize resource taxing relationships via premier\n                 niche markets. Professionally cultivate one-to-one customer\n                 service with robust ideas. Dynamically innovate\n                 resource-leveling customer service for state of the art customer\n                 service."
-               ,date: "2015-01-30"};
-   var reminder = {body: "Take out the trash"
-                  ,created: "2016-09-30"};
    return _elm.Main.values = {_op: _op
-                             ,reminder: reminder
-                             ,email: email
                              ,mailbox: mailbox
                              ,isDefined: isDefined
                              ,state: state

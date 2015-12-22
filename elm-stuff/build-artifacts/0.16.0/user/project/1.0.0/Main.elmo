@@ -11,8 +11,7 @@ Elm.Main.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Static = Elm.Static.make(_elm);
+   $Signal = Elm.Signal.make(_elm);
    var _op = {};
    var isDefined = function (maybe) {
       var _p0 = maybe;
@@ -43,16 +42,7 @@ Elm.Main.make = function (_elm) {
       $Maybe.Just));
       return A2($Signal.map,view,state);
    }();
-   var email = {from: "bossman@corporate.me"
-               ,to: "manager@corporate.me"
-               ,title: "Corporate Ipsum"
-               ,body: "Collaboratively administrate empowered markets via plug-and-play\n                 networks. Dynamically procrastinate B2C users after installed base\n                 benefits. Dramatically visualize customer directed convergence without\n                 revolutionary ROI.\n\n                 Efficiently unleash cross-media information without cross-media\n                 value. Quickly maximize timely deliverables for real-time\n                 schemas. Dramatically maintain clicks-and-mortar solutions\n                 without functional solutions.\n\n                 Completely synergize resource taxing relationships via premier\n                 niche markets. Professionally cultivate one-to-one customer\n                 service with robust ideas. Dynamically innovate\n                 resource-leveling customer service for state of the art customer\n                 service."
-               ,date: "2015-01-30"};
-   var reminder = {body: "Take out the trash"
-                  ,created: "2016-09-30"};
    return _elm.Main.values = {_op: _op
-                             ,reminder: reminder
-                             ,email: email
                              ,mailbox: mailbox
                              ,isDefined: isDefined
                              ,state: state

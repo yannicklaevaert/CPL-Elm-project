@@ -32,7 +32,7 @@ Elm.Item.make = function (_elm) {
    var Unpin = {ctor: "Unpin"};
    var Pin = {ctor: "Pin"};
    var view = F2(function (address,model) {
-      var _p1 = model.content;
+      var _p1 = model.itemType;
       if (_p1.ctor === "ReminderItem") {
             var _p2 = _p1._0;
             return A2($Html.div,
@@ -107,10 +107,8 @@ Elm.Item.make = function (_elm) {
                     _p4.date))]))]));
          }
    });
-   var reminder = {body: "Take out the trash"
-                  ,created: "2016-09-30"};
    var Model = F4(function (a,b,c,d) {
-      return {content: a,pinned: b,done: c,truncated: d};
+      return {itemType: a,pinned: b,done: c,truncated: d};
    });
    var EmailItem = function (a) {
       return {ctor: "EmailItem",_0: a};
@@ -118,20 +116,30 @@ Elm.Item.make = function (_elm) {
    var ReminderItem = function (a) {
       return {ctor: "ReminderItem",_0: a};
    };
-   var init = function (content) {
-      var _p5 = content;
+   var newItem = function (itemType) {
+      var _p5 = itemType;
       if (_p5.ctor === "ReminderItem") {
-            return A4(Model,ReminderItem(_p5._0),false,false,false);
+            return {itemType: ReminderItem(_p5._0)
+                   ,pinned: false
+                   ,done: false
+                   ,truncated: false};
          } else {
-            return A4(Model,EmailItem(_p5._0),false,false,true);
+            return {itemType: EmailItem(_p5._0)
+                   ,pinned: false
+                   ,done: false
+                   ,truncated: true};
          }
    };
+   var newReminder = F2(function (reminderBody,reminderDate) {
+      return newItem(ReminderItem({body: reminderBody
+                                  ,created: reminderDate}));
+   });
    return _elm.Item.values = {_op: _op
                              ,ReminderItem: ReminderItem
                              ,EmailItem: EmailItem
                              ,Model: Model
-                             ,init: init
-                             ,reminder: reminder
+                             ,newItem: newItem
+                             ,newReminder: newReminder
                              ,Pin: Pin
                              ,Unpin: Unpin
                              ,MarkAsDone: MarkAsDone

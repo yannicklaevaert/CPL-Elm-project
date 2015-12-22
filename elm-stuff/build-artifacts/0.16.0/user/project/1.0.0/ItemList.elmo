@@ -14,6 +14,7 @@ Elm.ItemList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Static = Elm.Static.make(_elm);
    var _op = {};
+   var Remove = function (a) {    return {ctor: "Remove",_0: a};};
    var Add = function (a) {    return {ctor: "Add",_0: a};};
    var SubAction = F2(function (a,b) {
       return {ctor: "SubAction",_0: a,_1: b};
@@ -25,7 +26,7 @@ Elm.ItemList.make = function (_elm) {
          A2($Signal.forwardTo,address,SubAction(_p1._0)),
          _p1._1);
       };
-      var items = A2($List.map,view$,model.state);
+      var items = A2($List.map,view$,model.items);
       return A2($Html.div,_U.list([]),items);
    });
    var updateItem = F3(function (f,id,model) {
@@ -37,11 +38,19 @@ Elm.ItemList.make = function (_elm) {
                 ,_0: _p4
                 ,_1: _U.eq(id,_p4) ? f(_p5) : _p5};
       };
-      return _U.update(model,{state: A2($List.map,test,model.state)});
+      return _U.update(model,{items: A2($List.map,test,model.items)});
+   });
+   var removeItem = F2(function (id,model) {
+      return _U.update(model,
+      {items: A2($List.filter,
+      function (i) {
+         return !_U.eq($Basics.fst(i),id);
+      },
+      model.items)});
    });
    var sortItems = function (unsorted) {
       var sorter = function (item) {
-         var _p6 = item.content;
+         var _p6 = item.itemType;
          if (_p6.ctor === "ReminderItem") {
                return _p6._0.created;
             } else {
@@ -50,19 +59,6 @@ Elm.ItemList.make = function (_elm) {
       };
       return A2($List.sortBy,sorter,unsorted);
    };
-   var startItems = function () {
-      var emails = A2($List.map,$Item.EmailItem,$Static.emails);
-      var reminders = A2($List.map,
-      $Item.ReminderItem,
-      $Static.reminders);
-      return sortItems(A2($List.map,
-      $Item.init,
-      A2($List.append,reminders,emails)));
-   }();
-   var Model = F2(function (a,b) {
-      return {state: a,nextItemId: b};
-   });
-   var initEmpty = A2(Model,_U.list([]),0);
    var initialise = F2(function (model,noIdList) {
       initialise: while (true) {
          var temp = $List.head(noIdList);
@@ -71,11 +67,11 @@ Elm.ItemList.make = function (_elm) {
                return model;
             } else {
                var justList = $List.tail(noIdList);
-               var newModel = A2(Model,
-               A2($List.append,
-               model.state,
-               _U.list([{ctor: "_Tuple2",_0: model.nextItemId,_1: _p7._0}])),
-               model.nextItemId + 1);
+               var newModel = _U.update(model,
+               {items: A2($Basics._op["++"],
+               model.items,
+               _U.list([{ctor: "_Tuple2",_0: model.nextItemId,_1: _p7._0}]))
+               ,nextItemId: model.nextItemId + 1});
                var _p8 = justList;
                if (_p8.ctor === "Nothing") {
                      return newModel;
@@ -88,20 +84,41 @@ Elm.ItemList.make = function (_elm) {
             }
       }
    });
-   var init = A2(initialise,A2(Model,_U.list([]),0),startItems);
+   var startItems = function () {
+      var emails = A2($List.map,$Item.EmailItem,$Static.emails);
+      var reminders = A2($List.map,
+      $Item.ReminderItem,
+      $Static.reminders);
+      return sortItems(A2($List.map,
+      $Item.newItem,
+      A2($List.append,reminders,emails)));
+   }();
+   var initEmpty = {items: _U.list([])
+                   ,nextItemId: 0
+                   ,visibility: "All"};
+   var Model = F3(function (a,b,c) {
+      return {items: a,nextItemId: b,visibility: c};
+   });
+   var init = A2(initialise,
+   A3(Model,_U.list([]),0,"All"),
+   startItems);
    var addItem = F2(function (item,model) {
       var items = A2($List._op["::"],
       item,
-      A2($List.map,$Basics.snd,model.state));
-      return A2(initialise,A2(Model,_U.list([]),0),sortItems(items));
+      A2($List.map,$Basics.snd,model.items));
+      return A2(initialise,
+      A3(Model,_U.list([]),0,model.visibility),
+      sortItems(items));
    });
    var update = F2(function (action,model) {
       var _p9 = action;
-      if (_p9.ctor === "Add") {
-            return A2(addItem,_p9._0,model);
-         } else {
-            return A3(updateItem,$Item.update(_p9._1),_p9._0,model);
-         }
+      switch (_p9.ctor)
+      {case "Add": return A2(addItem,_p9._0,model);
+         case "Remove": return A2(removeItem,_p9._0,model);
+         default: return A3(updateItem,
+           $Item.update(_p9._1),
+           _p9._0,
+           model);}
    });
    return _elm.ItemList.values = {_op: _op
                                  ,Model: Model
@@ -111,9 +128,11 @@ Elm.ItemList.make = function (_elm) {
                                  ,initialise: initialise
                                  ,sortItems: sortItems
                                  ,addItem: addItem
+                                 ,removeItem: removeItem
                                  ,updateItem: updateItem
                                  ,SubAction: SubAction
                                  ,Add: Add
+                                 ,Remove: Remove
                                  ,update: update
                                  ,view: view};
 };

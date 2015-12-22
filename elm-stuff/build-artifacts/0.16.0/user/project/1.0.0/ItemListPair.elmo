@@ -37,14 +37,14 @@ Elm.ItemListPair.make = function (_elm) {
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([_U.eq($List.length($Basics.fst(model).state),
+      _U.list([_U.eq($List.length($Basics.fst(model).items),
               0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
               _U.list([]),
               _U.list([$Html.text("To do")]))
               ,A2($ItemList.view,
               A2($Signal.forwardTo,address,TodoList),
               $Basics.fst(model))
-              ,_U.eq($List.length($Basics.snd(model).state),0) ? A2($Html.p,
+              ,_U.eq($List.length($Basics.snd(model).items),0) ? A2($Html.p,
               _U.list([]),
               _U.list([])) : A2($Html.h1,
               _U.list([]),

@@ -1,9 +1,7 @@
-module ItemListPair where
+module ItemFeed where
 
 import Signal
 import Html exposing ( Html )
-import Html.Attributes exposing (..)
-import Html.Events exposing (on, targetValue)
 import ItemList
 
 type alias Model = (ItemList.Model, ItemList.Model)
@@ -24,15 +22,23 @@ update action (todoList, doneList) =
 
 -- VIEW
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Signal.Address Action -> String -> Model -> Html
+view address reminder model =
   Html.div []
-      [ if List.length ((fst model).items) == 0
+      [ if List.length ((fst model).state) == 0
         then Html.p [] []
         else Html.h1 [] [Html.text "To do"]
       , ItemList.view (Signal.forwardTo address TodoList) (fst model)
-      , if List.length ((snd model).items) == 0
+      , if List.length ((snd model).state) == 0
         then Html.p [] []
         else Html.h1 [] [Html.text "Done"]
       , ItemList.view (Signal.forwardTo address DoneList) (snd model)
+      , Html.p [] []
+      , Html.h1 [] [Html.text "Add Reminder"]
+      , input
+          [ placeholder "New Reminder"
+            , value reminder
+            , onEnter address Add Item.newReminder reminder 
+            ]
+        []
       ]

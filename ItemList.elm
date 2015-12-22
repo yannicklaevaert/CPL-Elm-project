@@ -12,110 +12,81 @@ import List
 type alias Id = Int
 
 type alias Model =
-  { state : List (Id, Item.Model)
-  , nextItemId : Id }
+  { items : List (Id, Item.Model)
+  , nextItemId : Id
+  , visibility : String
+  }
 
 
 init : Model
-init = initialise (Model [] 0) startItems
+init = initialise (Model [] 0 "All") startItems
 
 initEmpty : Model
-initEmpty = Model [] 0
+initEmpty =
+  { items = []
+  , nextItemId = 0
+  , visibility = "All"
+  }
 
 startItems : List Item.Model
 startItems = let reminders = List.map Item.ReminderItem Static.reminders
                  emails = List.map Item.EmailItem Static.emails
-             in sortItems <|List.map Item.init (List.append reminders emails)
+             in sortItems <|List.map Item.newItem (List.append reminders emails)
 
 initialise : Model -> List Item.Model -> Model
 initialise model noIdList =
   let temp = (List.head noIdList)
   in case temp of
     Nothing -> model
-    Just a -> let newModel = Model (List.append model.state [(model.nextItemId, a)]) (model.nextItemId + 1)
-                  justList = (List.tail noIdList)
-              in case justList of
-                Nothing -> newModel
-                Just rest -> initialise newModel rest
+    Just nextItem -> let newModel = { model | items = model.items ++ [(model.nextItemId, nextItem)],
+                                              nextItemId = model.nextItemId + 1
+                                    }
+      --Model (List.append model.items [(model.nextItemId, a)]) (model.nextItemId + 1)
+                         justList = (List.tail noIdList)
+                     in case justList of
+                       Nothing -> newModel
+                       Just rest -> initialise newModel rest
 
 sortItems : List Item.Model -> List Item.Model
 sortItems unsorted = let sorter item =
-                        case item.content of
+                        case item.itemType of
                           Item.ReminderItem reminder -> reminder.created
                           Item.EmailItem email -> email.date
                      in List.sortBy sorter unsorted
 
 
-{-
-addItem : Item.Model -> Model -> Model
-addItem item model = addItemToList item model (Model [] 0)
-
-addItemToList : Item.Model -> Model -> Model -> Model
-addItemToList item model accumulator =
-  let createDateItem =
-    case item.content of
-      Item.ReminderItem reminder -> reminder.created
-      Item.EmailItem email -> email.date
-  in let createDateFirstItem =
-      case ((snd (List.head model.state)).content) of
-        Item.ReminderItem firstReminder -> firstReminder.created
-        Item.EmailItem firstEmail -> firstEmail.date
-     in if createDateFirstItem >= createDateItem
-        then let newModel = Model (List.append accumulator.state (accumulator.nextItemId, item))  (nextItemId + 1)
-             in updateAfterAddToItemList newModel model
-        else let newModel = Model (List.append accumulator.state (accumulator.nextItemId, (snd (List.head model.state))))  (nextItemId + 1)
-                 toDoList = List.tail model.state
-             in addItemToList item
-
-          Model (List.append model.state [(model.nextItemId, a)]) (model.nextItemId + 1)
-
-updateAfterAddToItemList : Model -> Model -> Model
-updateAfterAddToItemList accumulator notUpdated =
-  case notUpdated of
-    [] -> accumulator
-    _ -> let nextID = accumulator.nextItemId
-             nextItem = snd <| List.head notUpdated
-             toDoList = List.tail notUpdated
-         in updateAfterAddToItemList (List.append accumulator ([nextId, nextItem] (nextId + 1))) (toDoList)
-
-
-
-  Model ((model.nextCount, item) :: model.state) (model.nextCount + 1) }
--}
-
 addItem : Item.Model -> Model -> Model
 addItem item model =
-  let items = item :: (List.map snd model.state)
-  in initialise (Model [] 0) (sortItems items)
+  let items = item :: (List.map snd model.items)
+  in initialise (Model [] 0 model.visibility) (sortItems items)
 
 removeItem : Id -> Model -> Model
 removeItem id model =
-  let firstItem = snd (List.head model.state)
+  { model | items = List.filter (\i -> (fst i) /= id) model.items }
 
 updateItem : (Item.Model -> Item.Model) -> Id -> Model -> Model
 updateItem f id model =
   let test (id', x) = (id', if id == id' then f x else x)
-  in { model | state = List.map test model.state }
+  in { model | items = List.map test model.items }
 
 -- UPDATE
 
 type Action = SubAction Id Item.Action
               | Add Item.Model
---            | Remove
---            | SubAction Id Item.Action
+              | Remove Id
 
 update : Action -> Model -> Model
 update action model =
   case action of
     Add item ->
       addItem item model
---    Remove ->
---      removeItem model
+    Remove id ->
+      removeItem id model
     SubAction id action ->
       updateItem (Item.update action) id model
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   let view' (id, x) = Item.view (Signal.forwardTo address <| SubAction id) x
-      items = List.map view' model.state
+      items = List.map view' model.items
   in Html.div [] (items)
