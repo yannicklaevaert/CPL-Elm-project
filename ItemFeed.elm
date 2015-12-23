@@ -31,10 +31,29 @@ type Action = TodoList ItemList.Action
             | SaveContent String
             | SaveDate String
 
+help : ItemList.Id -> List (ItemList.Id, Item.Model) -> Item.Model
+help id list =
+  case list of
+    (x, y)::rest -> if x==id then y else help id rest
+    [] -> Item.dummyItem
+
 update : Action -> Model -> Model
 update action model =
   case action of
-    TodoList subAction -> { model | todoList = ItemList.update subAction model.todoList }
+    TodoList subAction ->
+      case subAction of
+        ItemList.SubAction id subSubAction ->
+          case subSubAction of
+            Item.Pin -> { model | todoList = ItemList.update subAction model.todoList }
+            Item.Unpin -> { model | todoList = ItemList.update subAction model.todoList }
+            Item.MarkAsDone -> { model | doneList = ItemList.update subAction (ItemList.update (ItemList.Add (help id ((model.todoList).items)))),
+                                         todoList = ItemList.update (ItemList.Remove id) }
+            Item.MarkUndone -> { model | todoList = ItemList.update subAction model.todoList }
+            _ -> { model | todoList = ItemList.update subAction model.todoList }
+
+        _ -> { model | todoList = ItemList.update subAction model.todoList }
+
+--      { model | todoList = ItemList.update subAction model.todoList }
     DoneList subAction -> { model | doneList = ItemList.update subAction model.doneList }
     SaveContent string -> { model | reminderField = string }
     SaveDate date -> { model | reminderDate = date }

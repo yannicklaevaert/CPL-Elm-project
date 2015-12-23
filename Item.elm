@@ -17,6 +17,8 @@ type alias Model =
     truncated : Bool
   }
 
+dummyItem : Model
+dummyItem = newReminder "dummyReminder" "01-01-2000"
 
 newItem : ItemType -> Model
 newItem itemType =

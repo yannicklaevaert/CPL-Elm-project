@@ -11986,8 +11986,27 @@ Elm.ItemFeed.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "TodoList": return _U.update(model,
-           {todoList: A2($ItemList.update,_p0._0,model.todoList)});
+      {case "TodoList": var _p3 = _p0._0;
+           var _p1 = _p3;
+           if (_p1.ctor === "SubAction") {
+                 var _p2 = _p1._1;
+                 switch (_p2.ctor)
+                 {case "Pin": return _U.update(model,
+                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                    case "Unpin": return _U.update(model,
+                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                    case "MarkAsDone": return _U.update(model,
+                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                    case "MarkUndone": return _U.update(model,
+                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                    case "Truncate": return _U.update(model,
+                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                    default: return _U.update(model,
+                      {todoList: A2($ItemList.update,_p3,model.todoList)});}
+              } else {
+                 return _U.update(model,
+                 {todoList: A2($ItemList.update,_p3,model.todoList)});
+              }
          case "DoneList": return _U.update(model,
            {doneList: A2($ItemList.update,_p0._0,model.doneList)});
          case "SaveContent": return _U.update(model,
