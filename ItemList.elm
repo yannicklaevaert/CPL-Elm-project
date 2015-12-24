@@ -74,6 +74,7 @@ updateItem f id model =
 type Action = SubAction Id Item.Action
               | Add Item.Model
               | Remove Id
+--              | AddUpdated Id Item.Action Item.Model
 
 update : Action -> Model -> Model
 update action model =
@@ -84,6 +85,8 @@ update action model =
       removeItem id model
     SubAction id action ->
       updateItem (Item.update action) id model
+--    AddUpdated id action item -> 
+
 
 view : Signal.Address Action -> Model -> Html
 view address model =

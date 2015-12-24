@@ -11812,10 +11812,12 @@ Elm.Item.make = function (_elm) {
       return newItem(ReminderItem({body: reminderBody
                                   ,created: reminderDate}));
    });
+   var dummyItem = A2(newReminder,"dummyReminder","01-01-2000");
    return _elm.Item.values = {_op: _op
                              ,ReminderItem: ReminderItem
                              ,EmailItem: EmailItem
                              ,Model: Model
+                             ,dummyItem: dummyItem
                              ,newItem: newItem
                              ,newReminder: newReminder
                              ,Pin: Pin
@@ -11983,35 +11985,85 @@ Elm.ItemFeed.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var help = F2(function (id,list) {
+      help: while (true) {
+         var _p0 = list;
+         if (_p0.ctor === "::") {
+               if (_U.eq(_p0._0._0,id)) return _p0._0._1; else {
+                     var _v1 = id,_v2 = _p0._1;
+                     id = _v1;
+                     list = _v2;
+                     continue help;
+                  }
+            } else {
+               return $Item.dummyItem;
+            }
+      }
+   });
    var update = F2(function (action,model) {
-      var _p0 = action;
-      switch (_p0.ctor)
-      {case "TodoList": var _p3 = _p0._0;
-           var _p1 = _p3;
-           if (_p1.ctor === "SubAction") {
-                 var _p2 = _p1._1;
-                 switch (_p2.ctor)
+      var _p1 = action;
+      switch (_p1.ctor)
+      {case "TodoList": var _p5 = _p1._0;
+           var _p2 = _p5;
+           if (_p2.ctor === "SubAction") {
+                 var _p4 = _p2._0;
+                 var _p3 = _p2._1;
+                 switch (_p3.ctor)
                  {case "Pin": return _U.update(model,
-                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                      {todoList: A2($ItemList.update,_p5,model.todoList)});
                     case "Unpin": return _U.update(model,
-                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                      {todoList: A2($ItemList.update,_p5,model.todoList)});
                     case "MarkAsDone": return _U.update(model,
-                      {todoList: A2($ItemList.update,_p3,model.todoList)});
-                    case "MarkUndone": return _U.update(model,
-                      {todoList: A2($ItemList.update,_p3,model.todoList)});
-                    case "Truncate": return _U.update(model,
-                      {todoList: A2($ItemList.update,_p3,model.todoList)});
+                      {doneList: function () {
+                         var updatedTodoList = A2($ItemList.update,
+                         _p5,
+                         model.todoList);
+                         return A2($ItemList.update,
+                         $ItemList.Add(A2(help,_p4,updatedTodoList.items)),
+                         model.doneList);
+                      }()
+                      ,todoList: A2($ItemList.update,
+                      $ItemList.Remove(_p4),
+                      model.todoList)});
+                    case "MarkUndone": return model;
                     default: return _U.update(model,
-                      {todoList: A2($ItemList.update,_p3,model.todoList)});}
+                      {todoList: A2($ItemList.update,_p5,model.todoList)});}
               } else {
                  return _U.update(model,
-                 {todoList: A2($ItemList.update,_p3,model.todoList)});
+                 {todoList: A2($ItemList.update,_p5,model.todoList)});
               }
-         case "DoneList": return _U.update(model,
-           {doneList: A2($ItemList.update,_p0._0,model.doneList)});
+         case "DoneList": var _p9 = _p1._0;
+           var _p6 = _p9;
+           if (_p6.ctor === "SubAction") {
+                 var _p8 = _p6._0;
+                 var _p7 = _p6._1;
+                 switch (_p7.ctor)
+                 {case "Pin": return _U.update(model,
+                      {doneList: A2($ItemList.update,_p9,model.doneList)});
+                    case "Unpin": return _U.update(model,
+                      {doneList: A2($ItemList.update,_p9,model.doneList)});
+                    case "MarkAsDone": return model;
+                    case "MarkUndone": return _U.update(model,
+                      {todoList: function () {
+                         var updatedDoneList = A2($ItemList.update,
+                         _p9,
+                         model.doneList);
+                         return A2($ItemList.update,
+                         $ItemList.Add(A2(help,_p8,updatedDoneList.items)),
+                         model.todoList);
+                      }()
+                      ,doneList: A2($ItemList.update,
+                      $ItemList.Remove(_p8),
+                      model.doneList)});
+                    default: return _U.update(model,
+                      {doneList: A2($ItemList.update,_p9,model.doneList)});}
+              } else {
+                 return _U.update(model,
+                 {doneList: A2($ItemList.update,_p9,model.doneList)});
+              }
          case "SaveContent": return _U.update(model,
-           {reminderField: _p0._0});
-         default: return _U.update(model,{reminderDate: _p0._0});}
+           {reminderField: _p1._0});
+         default: return _U.update(model,{reminderDate: _p1._0});}
    });
    var SaveDate = function (a) {
       return {ctor: "SaveDate",_0: a};
@@ -12091,6 +12143,7 @@ Elm.ItemFeed.make = function (_elm) {
                                  ,DoneList: DoneList
                                  ,SaveContent: SaveContent
                                  ,SaveDate: SaveDate
+                                 ,help: help
                                  ,update: update
                                  ,view: view};
 };

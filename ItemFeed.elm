@@ -44,18 +44,52 @@ update action model =
       case subAction of
         ItemList.SubAction id subSubAction ->
           case subSubAction of
+            -- TODO
             Item.Pin -> { model | todoList = ItemList.update subAction model.todoList }
+            -- TODO
             Item.Unpin -> { model | todoList = ItemList.update subAction model.todoList }
-            Item.MarkAsDone -> { model | doneList = ItemList.update subAction (ItemList.update (ItemList.Add (help id ((model.todoList).items)))),
-                                         todoList = ItemList.update (ItemList.Remove id) }
-            Item.MarkUndone -> { model | todoList = ItemList.update subAction model.todoList }
+            -- TODO Not totally correct, sometimes button is changed to undo, sometimes it stays mark as done
+--            Item.MarkAsDone -> { model | doneList = let tempDoneList = (ItemList.update (ItemList.Add (help id ((model.todoList).items))) model.doneList)
+--                                                    in ItemList.update subAction tempDoneList,
+--                                         todoList = ItemList.update (ItemList.Remove id) model.todoList }
+            -- Think it is correct now
+            -- When marked as done, item is updated in todolist, added to donelist and removed from todolist
+            Item.MarkAsDone -> { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
+                                                    in ItemList.update (ItemList.Add (help id (updatedTodoList.items))) model.doneList,
+                                         todoList = ItemList.update (ItemList.Remove id) model.todoList }
+            -- Not Possible because when marked done the item is not in this list
+            Item.MarkUndone -> model
+            -- Truncate or disabletruncate just updates the item in this list
             _ -> { model | todoList = ItemList.update subAction model.todoList }
-
+        -- Only the subaction add is possible when a new reminder is added
         _ -> { model | todoList = ItemList.update subAction model.todoList }
 
---      { model | todoList = ItemList.update subAction model.todoList }
-    DoneList subAction -> { model | doneList = ItemList.update subAction model.doneList }
+    DoneList subAction ->
+      case subAction of
+        ItemList.SubAction id subSubAction ->
+          case subSubAction of
+            -- TODO
+            Item.Pin -> { model | doneList = ItemList.update subAction model.doneList }
+            -- TODO
+            Item.Unpin -> { model | doneList = ItemList.update subAction model.doneList }
+            -- Not Possible because when marked undone the item is not in this list
+            Item.MarkAsDone -> model
+            -- TODO Not totally correct, sometimes button is changed to undo, sometimes it stays mark as done
+--            Item.MarkUndone -> { model | todoList = let tempTodoList = (ItemList.update (ItemList.Add (help id ((model.doneList).items))) model.todoList)
+--                                                    in ItemList.update subAction tempTodoList,
+--                                         doneList = ItemList.update (ItemList.Remove id) model.doneList }
+            -- Think it is correct now
+            -- When marked as done, item is updated in todolist, added to donelist and removed from todolist
+            Item.MarkUndone -> { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
+                                                    in ItemList.update (ItemList.Add (help id (updatedDoneList.items))) model.todoList,
+                                         doneList = ItemList.update (ItemList.Remove id) model.doneList }
+            -- Truncate or disabletruncate just updates the item in this list
+            _ -> { model | doneList = ItemList.update subAction model.doneList }
+        -- Only the subaction add is possible when a new reminder is added
+        _ -> { model | doneList = ItemList.update subAction model.doneList }
+
     SaveContent string -> { model | reminderField = string }
+    
     SaveDate date -> { model | reminderDate = date }
 
 -- VIEW
