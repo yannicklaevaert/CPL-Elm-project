@@ -134,10 +134,12 @@ Elm.Item.make = function (_elm) {
       return newItem(ReminderItem({body: reminderBody
                                   ,created: reminderDate}));
    });
+   var dummyItem = A2(newReminder,"dummyReminder","01-01-2000");
    return _elm.Item.values = {_op: _op
                              ,ReminderItem: ReminderItem
                              ,EmailItem: EmailItem
                              ,Model: Model
+                             ,dummyItem: dummyItem
                              ,newItem: newItem
                              ,newReminder: newReminder
                              ,Pin: Pin
