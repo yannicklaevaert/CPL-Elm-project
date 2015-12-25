@@ -45,9 +45,13 @@ update action model =
         ItemList.SubAction id subSubAction ->
           case subSubAction of
             -- TODO
-            Item.Pin -> { model | todoList = ItemList.update subAction model.todoList }
+            Item.Pin -> { model | todoList = let updatedTodoList = ItemList.update subAction model.todoList
+                                             in { items = (ItemList.sortPinnedUnpinned updatedTodoList.items),
+                                                  nextItemId = (model.todoList).nextItemId }}
             -- TODO
-            Item.Unpin -> { model | todoList = ItemList.update subAction model.todoList }
+            Item.Unpin -> { model | todoList = let updatedTodoList = ItemList.update subAction model.todoList
+                                               in { items = (ItemList.sortPinnedUnpinned updatedTodoList.items),
+                                                    nextItemId = (model.todoList).nextItemId }}
             -- TODO Not totally correct, sometimes button is changed to undo, sometimes it stays mark as done
 --            Item.MarkAsDone -> { model | doneList = let tempDoneList = (ItemList.update (ItemList.Add (help id ((model.todoList).items))) model.doneList)
 --                                                    in ItemList.update subAction tempDoneList,
@@ -69,9 +73,13 @@ update action model =
         ItemList.SubAction id subSubAction ->
           case subSubAction of
             -- TODO
-            Item.Pin -> { model | doneList = ItemList.update subAction model.doneList }
+            Item.Pin -> { model | doneList = let updatedDoneList = ItemList.update subAction model.doneList
+                                             in { items = (ItemList.sortPinnedUnpinned updatedDoneList.items),
+                                                  nextItemId = (model.doneList).nextItemId }}
             -- TODO
-            Item.Unpin -> { model | doneList = ItemList.update subAction model.doneList }
+            Item.Unpin -> { model | doneList = let updatedDoneList = ItemList.update subAction model.doneList
+                                               in { items = (ItemList.sortPinnedUnpinned updatedDoneList.items),
+                                                  nextItemId = (model.doneList).nextItemId }}
             -- Not Possible because when marked undone the item is not in this list
             Item.MarkAsDone -> model
             -- TODO Not totally correct, sometimes button is changed to undo, sometimes it stays mark as done
@@ -89,7 +97,7 @@ update action model =
         _ -> { model | doneList = ItemList.update subAction model.doneList }
 
     SaveContent string -> { model | reminderField = string }
-    
+
     SaveDate date -> { model | reminderDate = date }
 
 -- VIEW
