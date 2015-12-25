@@ -41,9 +41,21 @@ Elm.ItemFeed.make = function (_elm) {
                  var _p3 = _p2._1;
                  switch (_p3.ctor)
                  {case "Pin": return _U.update(model,
-                      {todoList: A2($ItemList.update,_p5,model.todoList)});
+                      {todoList: function () {
+                         var updatedTodoList = A2($ItemList.update,
+                         _p5,
+                         model.todoList);
+                         return {items: $ItemList.sortPinnedUnpinned(updatedTodoList.items)
+                                ,nextItemId: model.todoList.nextItemId};
+                      }()});
                     case "Unpin": return _U.update(model,
-                      {todoList: A2($ItemList.update,_p5,model.todoList)});
+                      {todoList: function () {
+                         var updatedTodoList = A2($ItemList.update,
+                         _p5,
+                         model.todoList);
+                         return {items: $ItemList.sortPinnedUnpinned(updatedTodoList.items)
+                                ,nextItemId: model.todoList.nextItemId};
+                      }()});
                     case "MarkAsDone": return _U.update(model,
                       {doneList: function () {
                          var updatedTodoList = A2($ItemList.update,
@@ -70,9 +82,21 @@ Elm.ItemFeed.make = function (_elm) {
                  var _p7 = _p6._1;
                  switch (_p7.ctor)
                  {case "Pin": return _U.update(model,
-                      {doneList: A2($ItemList.update,_p9,model.doneList)});
+                      {doneList: function () {
+                         var updatedDoneList = A2($ItemList.update,
+                         _p9,
+                         model.doneList);
+                         return {items: $ItemList.sortPinnedUnpinned(updatedDoneList.items)
+                                ,nextItemId: model.doneList.nextItemId};
+                      }()});
                     case "Unpin": return _U.update(model,
-                      {doneList: A2($ItemList.update,_p9,model.doneList)});
+                      {doneList: function () {
+                         var updatedDoneList = A2($ItemList.update,
+                         _p9,
+                         model.doneList);
+                         return {items: $ItemList.sortPinnedUnpinned(updatedDoneList.items)
+                                ,nextItemId: model.doneList.nextItemId};
+                      }()});
                     case "MarkAsDone": return model;
                     case "MarkUndone": return _U.update(model,
                       {todoList: function () {

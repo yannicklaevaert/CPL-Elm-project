@@ -14,18 +14,16 @@ type alias Id = Int
 type alias Model =
   { items : List (Id, Item.Model)
   , nextItemId : Id
-  , visibility : String
   }
 
 
 init : Model
-init = initialise (Model [] 0 "All") startItems
+init = initialise (Model [] 0 ) startItems
 
 initEmpty : Model
 initEmpty =
   { items = []
   , nextItemId = 0
-  , visibility = "All"
   }
 
 startItems : List Item.Model
@@ -54,11 +52,36 @@ sortItems unsorted = let sorter item =
                           Item.EmailItem email -> email.date
                      in List.sortBy sorter unsorted
 
+sortPinnedUnpinned : List (Id, Item.Model) -> List (Id, Item.Model)
+sortPinnedUnpinned unsorted = sortPinnedHelp unsorted [] []
+
+sortPinnedHelp : List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
+sortPinnedHelp unsorted pinnedList unpinnedList =
+  case unsorted of
+    [] -> (sortIdItems pinnedList []) ++ (sortIdItems unpinnedList [])
+    (id, item)::rest -> if item.pinned
+                        then sortPinnedHelp rest ((id, item)::pinnedList) unpinnedList
+                        else sortPinnedHelp rest pinnedList ((id, item)::unpinnedList)
+
+sortIdItems : List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
+sortIdItems unsorted acc =
+  case unsorted of
+     [] -> acc
+     (id, item)::rest -> let newAcc = placeIdItem (id, item) acc
+                         in sortIdItems rest newAcc
+
+placeIdItem : (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
+placeIdItem (id, item) list =
+  case list of
+    [] -> [(id, item)]
+    (xId, xItem)::rest -> if id < xId
+                          then (id, item)::list
+                          else (xId,xItem)::(placeIdItem (id, item) rest)
 
 addItem : Item.Model -> Model -> Model
 addItem item model =
   let items = item :: (List.map snd model.items)
-  in initialise (Model [] 0 model.visibility) (sortItems items)
+  in initialise (Model [] 0) (sortItems items)
 
 removeItem : Id -> Model -> Model
 removeItem id model =
@@ -74,7 +97,6 @@ updateItem f id model =
 type Action = SubAction Id Item.Action
               | Add Item.Model
               | Remove Id
---              | AddUpdated Id Item.Action Item.Model
 
 update : Action -> Model -> Model
 update action model =
@@ -85,7 +107,6 @@ update action model =
       removeItem id model
     SubAction id action ->
       updateItem (Item.update action) id model
---    AddUpdated id action item -> 
 
 
 view : Signal.Address Action -> Model -> Html
