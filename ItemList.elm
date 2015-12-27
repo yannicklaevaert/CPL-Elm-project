@@ -103,7 +103,7 @@ placeIdItem (id, item) list =
 addItem : Item.Model -> Model -> Model
 addItem item model =
   let newId = model.nextItemId
-  in { model | items = placeIdItem (newId, item) model.items,
+  in { model | items = sortPinnedUnpinned((newId, item)::(model.items)),
                nextItemId = newId + 1}
 
 removeItem : Id -> Model -> Model
