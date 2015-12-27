@@ -7,6 +7,7 @@ import ItemFeed
 import Html.Events as E
 import Maybe
 import Static
+import Keyboard
 
 -- Name: Yannick Laevaert
 -- Student ID: r0295605
@@ -63,11 +64,6 @@ import Static
 -- Summary:
 
 
--- Start of program
-
---main : Signal Html.Html
---main = Html.text "This should work."
---       |> Signal.constant
 
 
 mailbox : Signal.Mailbox (Maybe ItemFeed.Action)
@@ -85,7 +81,10 @@ state =
         case action of
           Just a -> ItemFeed.update a model
           _ -> model
-  in Signal.foldp update ItemFeed.init mailbox.signal
+--  in Signal.foldp update ItemFeed.init mailbox.signal
+    in Signal.foldp update ItemFeed.init inputs
+
+inputs = Signal.merge mailbox.signal (Signal.map Just (Signal.map2  ItemFeed.KeyPress Keyboard.alt Keyboard.keysDown))
 
 main : Signal Html
 main =

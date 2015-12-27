@@ -6,7 +6,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ItemList
 import Item
-import Date
+import Json.Decode as Json
+import Set
+import Char
 
 
 type alias Model =
@@ -14,14 +16,17 @@ type alias Model =
   , doneList : ItemList.Model
   , reminderField : String
   , reminderDate : String
+  , selected : Int
   }
 
 init : Model
 init =
-  { todoList = ItemList.init
+  { todoList = let initTodoList = ItemList.init
+               in ItemList.update (ItemList.SubAction 0 Item.Select) initTodoList
   , doneList = ItemList.initEmpty
   , reminderField = ""
-  , reminderDate = "01-01-2015"
+  , reminderDate = "2015-01-01"
+  , selected = 0
   }
 
 -- UPDATE
@@ -30,6 +35,7 @@ type Action = TodoList ItemList.Action
             | DoneList ItemList.Action
             | SaveContent String
             | SaveDate String
+            | KeyPress Bool (Set.Set (Char.KeyCode))
 
 help : ItemList.Id -> List (ItemList.Id, Item.Model) -> Item.Model
 help id list =
@@ -100,19 +106,49 @@ update action model =
 
     SaveDate date -> { model | reminderDate = date }
 
+    KeyPress altPressed keyCodes ->
+      if altPressed
+      -- "s" has keycode 83
+      then if Set.member 83 keyCodes
+           then { model | todoList = ItemList.sortOldNoPin model.todoList,
+                          doneList = ItemList.sortOldNoPin model.doneList }
+      -- "j" has keycode 74
+           else if Set.member 74 keyCodes
+                then { model | selected = let totalListLength = List.length (model.todoList).items + List.length (model.doneList).items
+                                          in if model.selected == totalListLength - 1
+                                             then 0
+                                             else model.selected + 1,
+                               todoList = if List.length (model.todoList).items - 1 > model.selected
+                                          then let (id, _) = ItemList.getItem (model.selected + 1) model.todoList
+                                               in ItemList.update (ItemList.SubAction id Item.Select) model.todoList
+                                          else model.todoList,
+                               doneList = if List.length (model.todoList).items - 1 <= model.selected
+                                          then let (id, _) = ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items - 1) ) model.doneList
+                                               in ItemList.update (ItemList.SubAction id Item.Select) model.doneList
+                                          else model.doneList }
+                else { model | todoList = ItemList.sortNewWithPin model.todoList,
+                               doneList = ItemList.sortNewWithPin model.doneList }
+      else { model | todoList = ItemList.sortNewWithPin model.todoList,
+                     doneList = ItemList.sortNewWithPin model.doneList }
+
+
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   Html.div []
-      [ if List.length ((model.todoList).items) == 0
-        then Html.p [] []
-        else Html.h1 [] [Html.text "To do"]
-      , ItemList.view (Signal.forwardTo address TodoList) (model.todoList)
-      , if List.length ((model.doneList).items) == 0
-        then Html.p [] []
-        else Html.h1 [] [Html.text "Done"]
-      , ItemList.view (Signal.forwardTo address DoneList) (model.doneList)
+      [ Html.div []
+        [ if List.length ((model.todoList).items) == 0
+          then Html.p [] []
+          else Html.h1 [] [Html.text "To do"]
+          , ItemList.view (Signal.forwardTo address TodoList) (model.todoList)
+        ]
+      , Html.div []
+        [ if List.length ((model.doneList).items) == 0
+          then Html.p [] []
+          else Html.h1 [] [Html.text "Done"]
+          , ItemList.view (Signal.forwardTo address DoneList) (model.doneList)
+        ]
       , Html.p [] []
       , Html.h1 [] [Html.text "Reminder"]
       , Html.input
@@ -120,11 +156,24 @@ view address model =
             , on "input" targetValue (\str -> Signal.message address (SaveContent str))
             , type' "text"
             , value model.reminderField
+            , onEnter address (TodoList (ItemList.Add (Item.newReminder model.reminderField model.reminderDate)))
           ] []
       , Html.input
           [ type' "date"
             , on "input" targetValue (\date -> Signal.message address (SaveDate date))
             , value model.reminderDate
+            , onEnter address (TodoList (ItemList.Add (Item.newReminder model.reminderField model.reminderDate)))
           ] []
       , Html.button [ onClick address (TodoList (ItemList.Add (Item.newReminder model.reminderField model.reminderDate)))] [ Html.text "Add" ]
       ]
+
+
+onEnter : Signal.Address Action -> Action -> Html.Attribute
+onEnter address action =
+    on "keydown"
+      (Json.customDecoder keyCode is13)
+      (\_ -> Signal.message address action)
+
+is13 : Int -> Result String ()
+is13 code =
+  if code == 13 then Ok () else Err "not the right key code"

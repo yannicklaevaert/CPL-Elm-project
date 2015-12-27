@@ -5,23 +5,38 @@ Elm.ItemFeed.make = function (_elm) {
    if (_elm.ItemFeed.values) return _elm.ItemFeed.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Char = Elm.Char.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $Item = Elm.Item.make(_elm),
    $ItemList = Elm.ItemList.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
+   $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var is13 = function (code) {
+      return _U.eq(code,
+      13) ? $Result.Ok({ctor: "_Tuple0"}) : $Result.Err("not the right key code");
+   };
+   var onEnter = F2(function (address,action) {
+      return A3($Html$Events.on,
+      "keydown",
+      A2($Json$Decode.customDecoder,$Html$Events.keyCode,is13),
+      function (_p0) {
+         return A2($Signal.message,address,action);
+      });
+   });
    var help = F2(function (id,list) {
       help: while (true) {
-         var _p0 = list;
-         if (_p0.ctor === "::") {
-               if (_U.eq(_p0._0._0,id)) return _p0._0._1; else {
-                     var _v1 = id,_v2 = _p0._1;
+         var _p1 = list;
+         if (_p1.ctor === "::") {
+               if (_U.eq(_p1._0._0,id)) return _p1._0._1; else {
+                     var _v1 = id,_v2 = _p1._1;
                      id = _v1;
                      list = _v2;
                      continue help;
@@ -32,18 +47,18 @@ Elm.ItemFeed.make = function (_elm) {
       }
    });
    var update = F2(function (action,model) {
-      var _p1 = action;
-      switch (_p1.ctor)
-      {case "TodoList": var _p5 = _p1._0;
-           var _p2 = _p5;
-           if (_p2.ctor === "SubAction") {
-                 var _p4 = _p2._0;
-                 var _p3 = _p2._1;
-                 switch (_p3.ctor)
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "TodoList": var _p6 = _p2._0;
+           var _p3 = _p6;
+           if (_p3.ctor === "SubAction") {
+                 var _p5 = _p3._0;
+                 var _p4 = _p3._1;
+                 switch (_p4.ctor)
                  {case "Pin": return _U.update(model,
                       {todoList: function () {
                          var updatedTodoList = A2($ItemList.update,
-                         _p5,
+                         _p6,
                          model.todoList);
                          return {items: $ItemList.sortPinnedUnpinned(updatedTodoList.items)
                                 ,nextItemId: model.todoList.nextItemId};
@@ -51,7 +66,7 @@ Elm.ItemFeed.make = function (_elm) {
                     case "Unpin": return _U.update(model,
                       {todoList: function () {
                          var updatedTodoList = A2($ItemList.update,
-                         _p5,
+                         _p6,
                          model.todoList);
                          return {items: $ItemList.sortPinnedUnpinned(updatedTodoList.items)
                                 ,nextItemId: model.todoList.nextItemId};
@@ -59,32 +74,32 @@ Elm.ItemFeed.make = function (_elm) {
                     case "MarkAsDone": return _U.update(model,
                       {doneList: function () {
                          var updatedTodoList = A2($ItemList.update,
-                         _p5,
+                         _p6,
                          model.todoList);
                          return A2($ItemList.update,
-                         $ItemList.Add(A2(help,_p4,updatedTodoList.items)),
+                         $ItemList.Add(A2(help,_p5,updatedTodoList.items)),
                          model.doneList);
                       }()
                       ,todoList: A2($ItemList.update,
-                      $ItemList.Remove(_p4),
+                      $ItemList.Remove(_p5),
                       model.todoList)});
                     case "MarkUndone": return model;
                     default: return _U.update(model,
-                      {todoList: A2($ItemList.update,_p5,model.todoList)});}
+                      {todoList: A2($ItemList.update,_p6,model.todoList)});}
               } else {
                  return _U.update(model,
-                 {todoList: A2($ItemList.update,_p5,model.todoList)});
+                 {todoList: A2($ItemList.update,_p6,model.todoList)});
               }
-         case "DoneList": var _p9 = _p1._0;
-           var _p6 = _p9;
-           if (_p6.ctor === "SubAction") {
-                 var _p8 = _p6._0;
-                 var _p7 = _p6._1;
-                 switch (_p7.ctor)
+         case "DoneList": var _p10 = _p2._0;
+           var _p7 = _p10;
+           if (_p7.ctor === "SubAction") {
+                 var _p9 = _p7._0;
+                 var _p8 = _p7._1;
+                 switch (_p8.ctor)
                  {case "Pin": return _U.update(model,
                       {doneList: function () {
                          var updatedDoneList = A2($ItemList.update,
-                         _p9,
+                         _p10,
                          model.doneList);
                          return {items: $ItemList.sortPinnedUnpinned(updatedDoneList.items)
                                 ,nextItemId: model.doneList.nextItemId};
@@ -92,7 +107,7 @@ Elm.ItemFeed.make = function (_elm) {
                     case "Unpin": return _U.update(model,
                       {doneList: function () {
                          var updatedDoneList = A2($ItemList.update,
-                         _p9,
+                         _p10,
                          model.doneList);
                          return {items: $ItemList.sortPinnedUnpinned(updatedDoneList.items)
                                 ,nextItemId: model.doneList.nextItemId};
@@ -101,24 +116,66 @@ Elm.ItemFeed.make = function (_elm) {
                     case "MarkUndone": return _U.update(model,
                       {todoList: function () {
                          var updatedDoneList = A2($ItemList.update,
-                         _p9,
+                         _p10,
                          model.doneList);
                          return A2($ItemList.update,
-                         $ItemList.Add(A2(help,_p8,updatedDoneList.items)),
+                         $ItemList.Add(A2(help,_p9,updatedDoneList.items)),
                          model.todoList);
                       }()
                       ,doneList: A2($ItemList.update,
-                      $ItemList.Remove(_p8),
+                      $ItemList.Remove(_p9),
                       model.doneList)});
                     default: return _U.update(model,
-                      {doneList: A2($ItemList.update,_p9,model.doneList)});}
+                      {doneList: A2($ItemList.update,_p10,model.doneList)});}
               } else {
                  return _U.update(model,
-                 {doneList: A2($ItemList.update,_p9,model.doneList)});
+                 {doneList: A2($ItemList.update,_p10,model.doneList)});
               }
          case "SaveContent": return _U.update(model,
-           {reminderField: _p1._0});
-         default: return _U.update(model,{reminderDate: _p1._0});}
+           {reminderField: _p2._0});
+         case "SaveDate": return _U.update(model,{reminderDate: _p2._0});
+         default: var _p13 = _p2._1;
+           return _p2._0 ? A2($Set.member,83,_p13) ? _U.update(model,
+           {todoList: $ItemList.sortOldNoPin(model.todoList)
+           ,doneList: $ItemList.sortOldNoPin(model.doneList)}) : A2($Set.member,
+           74,
+           _p13) ? _U.update(model,
+           {selected: function () {
+              var totalListLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
+              return _U.eq(model.selected,
+              totalListLength - 1) ? 0 : model.selected + 1;
+           }()
+           ,todoList: function () {
+              if (_U.cmp($List.length(model.todoList.items) - 1,
+              model.selected) > 0) {
+                    var _p11 = A2($ItemList.getItem,
+                    model.selected + 1,
+                    model.todoList);
+                    var id = _p11._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.Select),
+                    model.todoList);
+                 } else return model.todoList;
+           }()
+           ,doneList: function () {
+              if (_U.cmp($List.length(model.todoList.items) - 1,
+              model.selected) < 1) {
+                    var _p12 = A2($ItemList.getItem,
+                    model.selected + 1 - ($List.length(model.todoList.items) - 1),
+                    model.doneList);
+                    var id = _p12._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.Select),
+                    model.doneList);
+                 } else return model.doneList;
+           }()}) : _U.update(model,
+           {todoList: $ItemList.sortNewWithPin(model.todoList)
+           ,doneList: $ItemList.sortNewWithPin(model.doneList)}) : _U.update(model,
+           {todoList: $ItemList.sortNewWithPin(model.todoList)
+           ,doneList: $ItemList.sortNewWithPin(model.doneList)});}
+   });
+   var KeyPress = F2(function (a,b) {
+      return {ctor: "KeyPress",_0: a,_1: b};
    });
    var SaveDate = function (a) {
       return {ctor: "SaveDate",_0: a};
@@ -135,21 +192,24 @@ Elm.ItemFeed.make = function (_elm) {
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([_U.eq($List.length(model.todoList.items),
-              0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
+      _U.list([A2($Html.div,
               _U.list([]),
-              _U.list([$Html.text("To do")]))
-              ,A2($ItemList.view,
-              A2($Signal.forwardTo,address,TodoList),
-              model.todoList)
-              ,_U.eq($List.length(model.doneList.items),0) ? A2($Html.p,
+              _U.list([_U.eq($List.length(model.todoList.items),
+                      0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
+                      _U.list([]),
+                      _U.list([$Html.text("To do")]))
+                      ,A2($ItemList.view,
+                      A2($Signal.forwardTo,address,TodoList),
+                      model.todoList)]))
+              ,A2($Html.div,
               _U.list([]),
-              _U.list([])) : A2($Html.h1,
-              _U.list([]),
-              _U.list([$Html.text("Done")]))
-              ,A2($ItemList.view,
-              A2($Signal.forwardTo,address,DoneList),
-              model.doneList)
+              _U.list([_U.eq($List.length(model.doneList.items),
+                      0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
+                      _U.list([]),
+                      _U.list([$Html.text("Done")]))
+                      ,A2($ItemList.view,
+                      A2($Signal.forwardTo,address,DoneList),
+                      model.doneList)]))
               ,A2($Html.p,_U.list([]),_U.list([]))
               ,A2($Html.h1,_U.list([]),_U.list([$Html.text("Reminder")]))
               ,A2($Html.input,
@@ -161,7 +221,12 @@ Elm.ItemFeed.make = function (_elm) {
                          return A2($Signal.message,address,SaveContent(str));
                       })
                       ,$Html$Attributes.type$("text")
-                      ,$Html$Attributes.value(model.reminderField)]),
+                      ,$Html$Attributes.value(model.reminderField)
+                      ,A2(onEnter,
+                      address,
+                      TodoList($ItemList.Add(A2($Item.newReminder,
+                      model.reminderField,
+                      model.reminderDate))))]),
               _U.list([]))
               ,A2($Html.input,
               _U.list([$Html$Attributes.type$("date")
@@ -171,7 +236,12 @@ Elm.ItemFeed.make = function (_elm) {
                       function (date) {
                          return A2($Signal.message,address,SaveDate(date));
                       })
-                      ,$Html$Attributes.value(model.reminderDate)]),
+                      ,$Html$Attributes.value(model.reminderDate)
+                      ,A2(onEnter,
+                      address,
+                      TodoList($ItemList.Add(A2($Item.newReminder,
+                      model.reminderField,
+                      model.reminderDate))))]),
               _U.list([]))
               ,A2($Html.button,
               _U.list([A2($Html$Events.onClick,
@@ -181,15 +251,22 @@ Elm.ItemFeed.make = function (_elm) {
               model.reminderDate))))]),
               _U.list([$Html.text("Add")]))]));
    });
-   var init = {todoList: $ItemList.init
+   var init = {todoList: function () {
+                 var initTodoList = $ItemList.init;
+                 return A2($ItemList.update,
+                 A2($ItemList.SubAction,0,$Item.Select),
+                 initTodoList);
+              }()
               ,doneList: $ItemList.initEmpty
               ,reminderField: ""
-              ,reminderDate: "01-01-2015"};
-   var Model = F4(function (a,b,c,d) {
+              ,reminderDate: "2015-01-01"
+              ,selected: 0};
+   var Model = F5(function (a,b,c,d,e) {
       return {todoList: a
              ,doneList: b
              ,reminderField: c
-             ,reminderDate: d};
+             ,reminderDate: d
+             ,selected: e};
    });
    return _elm.ItemFeed.values = {_op: _op
                                  ,Model: Model
@@ -198,7 +275,10 @@ Elm.ItemFeed.make = function (_elm) {
                                  ,DoneList: DoneList
                                  ,SaveContent: SaveContent
                                  ,SaveDate: SaveDate
+                                 ,KeyPress: KeyPress
                                  ,help: help
                                  ,update: update
-                                 ,view: view};
+                                 ,view: view
+                                 ,onEnter: onEnter
+                                 ,is13: is13};
 };
