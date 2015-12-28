@@ -7,27 +7,176 @@ Elm.ItemListPair.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Item = Elm.Item.make(_elm),
    $ItemList = Elm.ItemList.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var update = F2(function (action,_p0) {
-      var _p1 = _p0;
-      var _p4 = _p1._0;
-      var _p3 = _p1._1;
-      var _p2 = action;
-      if (_p2.ctor === "TodoList") {
-            return {ctor: "_Tuple2"
-                   ,_0: A2($ItemList.update,_p2._0,_p4)
-                   ,_1: _p3};
-         } else {
-            return {ctor: "_Tuple2"
-                   ,_0: _p4
-                   ,_1: A2($ItemList.update,_p2._0,_p3)};
-         }
+   var getNextItem = function (model) {
+      var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
+      return _U.cmp(A2($Basics._op["%"],
+      model.selected + 1,
+      totalLength),
+      $List.length(model.todoList.items)) > 0 ? A2($ItemList.getItem,
+      model.selected + 1 - $List.length(model.todoList.items),
+      model.doneList) : A2($ItemList.getItem,
+      model.selected + 1,
+      model.todoList);
+   };
+   var getNextItemList = function (model) {
+      var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
+      return _U.cmp(A2($Basics._op["%"],
+      model.selected + 1,
+      totalLength),
+      $List.length(model.todoList.items)) > 0 ? false : true;
+   };
+   var getPreviousItem = function (model) {
+      var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
+      return _U.cmp(A2($Basics._op["%"],
+      model.selected - 1,
+      totalLength),
+      0) > 0 && _U.cmp(A2($Basics._op["%"],
+      model.selected - 1,
+      totalLength),
+      $List.length(model.todoList.items)) < 1 ? A2($ItemList.getItem,
+      model.selected - 1,
+      model.todoList) : _U.cmp(A2($Basics._op["%"],
+      model.selected - 1,
+      totalLength),
+      0) > 0 ? A2($ItemList.getItem,
+      totalLength - $List.length(model.todoList.items),
+      model.doneList) : A2($ItemList.getItem,
+      model.selected - 1 - $List.length(model.todoList.items),
+      model.doneList);
+   };
+   var getPreviousItemList = function (model) {
+      var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
+      return _U.cmp(A2($Basics._op["%"],
+      model.selected - 1,
+      totalLength),
+      0) > 0 && _U.cmp(A2($Basics._op["%"],
+      model.selected - 1,
+      totalLength),
+      $List.length(model.todoList.items)) < 1 ? true : false;
+   };
+   var getSelectedItem = function (model) {
+      return _U.cmp(model.selected,
+      $List.length(model.todoList.items)) > 0 ? A2($ItemList.getItem,
+      model.selected - $List.length(model.todoList.items),
+      model.doneList) : A2($ItemList.getItem,
+      model.selected,
+      model.todoList);
+   };
+   var getSelectedItemList = function (model) {
+      return _U.cmp(model.selected,
+      $List.length(model.todoList.items)) > 0 ? false : true;
+   };
+   var help = F2(function (id,list) {
+      help: while (true) {
+         var _p0 = list;
+         if (_p0.ctor === "::") {
+               if (_U.eq(_p0._0._0,id)) return _p0._0._1; else {
+                     var _v1 = id,_v2 = _p0._1;
+                     id = _v1;
+                     list = _v2;
+                     continue help;
+                  }
+            } else {
+               return $Item.dummyItem;
+            }
+      }
    });
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      switch (_p1.ctor)
+      {case "TodoList": var _p5 = _p1._0;
+           var _p2 = _p5;
+           if (_p2.ctor === "SubAction") {
+                 var _p4 = _p2._0;
+                 var _p3 = _p2._1;
+                 switch (_p3.ctor)
+                 {case "TogglePin": return _U.update(model,
+                      {todoList: function () {
+                         var updatedTodoList = A2($ItemList.update,
+                         _p5,
+                         model.todoList);
+                         return {items: A2($ItemList.update,
+                                $ItemList.SortNewWithPin,
+                                updatedTodoList).items
+                                ,nextItemId: model.todoList.nextItemId};
+                      }()});
+                    case "ToggleDone": return _U.update(model,
+                      {doneList: function () {
+                         var updatedTodoList = A2($ItemList.update,
+                         _p5,
+                         model.todoList);
+                         return A2($ItemList.update,
+                         A2($ItemList.AddItem,_p4,A2(help,_p4,updatedTodoList.items)),
+                         model.doneList);
+                      }()
+                      ,todoList: A2($ItemList.update,
+                      $ItemList.Remove(_p4),
+                      model.todoList)});
+                    default: return _U.update(model,
+                      {todoList: A2($ItemList.update,_p5,model.todoList)});}
+              } else {
+                 return _U.update(model,
+                 {todoList: A2($ItemList.update,_p5,model.todoList)});
+              }
+         case "DoneList": var _p9 = _p1._0;
+           var _p6 = _p9;
+           if (_p6.ctor === "SubAction") {
+                 var _p8 = _p6._0;
+                 var _p7 = _p6._1;
+                 switch (_p7.ctor)
+                 {case "TogglePin": return _U.update(model,
+                      {doneList: function () {
+                         var updatedDoneList = A2($ItemList.update,
+                         _p9,
+                         model.doneList);
+                         return {items: A2($ItemList.update,
+                                $ItemList.SortNewWithPin,
+                                updatedDoneList).items
+                                ,nextItemId: model.doneList.nextItemId};
+                      }()});
+                    case "ToggleDone": return _U.update(model,
+                      {todoList: function () {
+                         var updatedDoneList = A2($ItemList.update,
+                         _p9,
+                         model.doneList);
+                         return A2($ItemList.update,
+                         A2($ItemList.AddItem,_p8,A2(help,_p8,updatedDoneList.items)),
+                         model.todoList);
+                      }()
+                      ,doneList: A2($ItemList.update,
+                      $ItemList.Remove(_p8),
+                      model.doneList)});
+                    default: return _U.update(model,
+                      {doneList: A2($ItemList.update,_p9,model.doneList)});}
+              } else {
+                 return _U.update(model,
+                 {doneList: A2($ItemList.update,_p9,model.doneList)});
+              }
+         case "SelectNext": return _U.update(model,
+           {selected: function () {
+              var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
+              return A2($Basics._op["%"],model.selected + 1,totalLength);
+           }()});
+         default: return _U.update(model,
+           {selected: function () {
+              var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
+              return _U.cmp(A2($Basics._op["%"],
+              model.selected - 1,
+              totalLength),
+              0) < 0 ? totalLength : A2($Basics._op["%"],
+              model.selected - 1,
+              totalLength);
+           }()});}
+   });
+   var SelectPrevious = {ctor: "SelectPrevious"};
+   var SelectNext = {ctor: "SelectNext"};
    var DoneList = function (a) {
       return {ctor: "DoneList",_0: a};
    };
@@ -37,29 +186,50 @@ Elm.ItemListPair.make = function (_elm) {
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([_U.eq($List.length($Basics.fst(model).items),
-              0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
+      _U.list([A2($Html.div,
               _U.list([]),
-              _U.list([$Html.text("To do")]))
-              ,A2($ItemList.view,
-              A2($Signal.forwardTo,address,TodoList),
-              $Basics.fst(model))
-              ,_U.eq($List.length($Basics.snd(model).items),0) ? A2($Html.p,
+              _U.list([_U.eq($List.length(model.todoList.items),
+                      0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
+                      _U.list([]),
+                      _U.list([$Html.text("To do")]))
+                      ,A2($ItemList.view,
+                      A2($Signal.forwardTo,address,TodoList),
+                      model.todoList)]))
+              ,A2($Html.div,
               _U.list([]),
-              _U.list([])) : A2($Html.h1,
-              _U.list([]),
-              _U.list([$Html.text("Done")]))
-              ,A2($ItemList.view,
-              A2($Signal.forwardTo,address,DoneList),
-              $Basics.snd(model))]));
+              _U.list([_U.eq($List.length(model.doneList.items),
+                      0) ? A2($Html.p,_U.list([]),_U.list([])) : A2($Html.h1,
+                      _U.list([]),
+                      _U.list([$Html.text("Done")]))
+                      ,A2($ItemList.view,
+                      A2($Signal.forwardTo,address,DoneList),
+                      model.doneList)]))]));
    });
-   var init = {ctor: "_Tuple2"
-              ,_0: $ItemList.init
-              ,_1: $ItemList.initEmpty};
+   var init = {todoList: function () {
+                 var initTodoList = $ItemList.init;
+                 return A2($ItemList.update,
+                 A2($ItemList.SubAction,0,$Item.ToggleSelect),
+                 initTodoList);
+              }()
+              ,doneList: $ItemList.initEmpty
+              ,selected: 0};
+   var Model = F3(function (a,b,c) {
+      return {todoList: a,doneList: b,selected: c};
+   });
    return _elm.ItemListPair.values = {_op: _op
+                                     ,Model: Model
                                      ,init: init
                                      ,TodoList: TodoList
                                      ,DoneList: DoneList
+                                     ,SelectNext: SelectNext
+                                     ,SelectPrevious: SelectPrevious
+                                     ,help: help
+                                     ,getSelectedItemList: getSelectedItemList
+                                     ,getSelectedItem: getSelectedItem
+                                     ,getPreviousItemList: getPreviousItemList
+                                     ,getPreviousItem: getPreviousItem
+                                     ,getNextItemList: getNextItemList
+                                     ,getNextItem: getNextItem
                                      ,update: update
                                      ,view: view};
 };
