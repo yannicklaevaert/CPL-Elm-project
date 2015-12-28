@@ -11955,24 +11955,20 @@ Elm.Item.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "Pin": return _U.update(model,{pinned: true});
-         case "Unpin": return _U.update(model,{pinned: false});
-         case "MarkAsDone": return _U.update(model,{done: true});
-         case "MarkUndone": return _U.update(model,{done: false});
-         case "Truncate": return _U.update(model,{truncated: true});
-         case "DisableTruncate": return _U.update(model,
-           {truncated: false});
+      {case "TogglePin": return _U.update(model,
+           {pinned: model.pinned ? false : true});
+         case "ToggleDone": return _U.update(model,
+           {done: model.done ? false : true});
+         case "ToggleTruncate": return _U.update(model,
+           {truncated: model.truncated ? false : true});
          case "Select": return _U.update(model,{selected: true});
          default: return _U.update(model,{selected: false});}
    });
    var Deselect = {ctor: "Deselect"};
    var Select = {ctor: "Select"};
-   var DisableTruncate = {ctor: "DisableTruncate"};
-   var Truncate = {ctor: "Truncate"};
-   var MarkUndone = {ctor: "MarkUndone"};
-   var MarkAsDone = {ctor: "MarkAsDone"};
-   var Unpin = {ctor: "Unpin"};
-   var Pin = {ctor: "Pin"};
+   var ToggleTruncate = {ctor: "ToggleTruncate"};
+   var ToggleDone = {ctor: "ToggleDone"};
+   var TogglePin = {ctor: "TogglePin"};
    var view = F2(function (address,model) {
       var _p1 = model.itemType;
       if (_p1.ctor === "ReminderItem") {
@@ -11994,14 +11990,14 @@ Elm.Item.make = function (_elm) {
                     ,A2($Html.p,
                     _U.list([]),
                     _U.list([_U.eq(model.done,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Undo")]))
                             ,_U.eq(model.pinned,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Pin")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Unpin")]))]))
                     ,A2($Html.p,
                     _U.list([]),
@@ -12048,21 +12044,21 @@ Elm.Item.make = function (_elm) {
                     _U.list([]),
                     _U.list([_U.cmp($String.length(_p4.body),
                             200) > -1 ? _U.eq(model.truncated,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Truncate)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleTruncate)]),
                             _U.list([$Html.text("Less")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,DisableTruncate)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleTruncate)]),
                             _U.list([$Html.text("More")])) : A2($Html.p,
                             _U.list([]),
                             _U.list([]))
                             ,_U.eq(model.done,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Undo")]))
                             ,_U.eq(model.pinned,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Pin")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Unpin")]))]))
                     ,A2($Html.p,
                     _U.list([]),
@@ -12112,12 +12108,9 @@ Elm.Item.make = function (_elm) {
                              ,dummyItem: dummyItem
                              ,newItem: newItem
                              ,newReminder: newReminder
-                             ,Pin: Pin
-                             ,Unpin: Unpin
-                             ,MarkAsDone: MarkAsDone
-                             ,MarkUndone: MarkUndone
-                             ,Truncate: Truncate
-                             ,DisableTruncate: DisableTruncate
+                             ,TogglePin: TogglePin
+                             ,ToggleDone: ToggleDone
+                             ,ToggleTruncate: ToggleTruncate
                              ,Select: Select
                              ,Deselect: Deselect
                              ,update: update
@@ -12139,6 +12132,9 @@ Elm.ItemList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Static = Elm.Static.make(_elm);
    var _op = {};
+   var DoubleSubAction = F4(function (a,b,c,d) {
+      return {ctor: "DoubleSubAction",_0: a,_1: b,_2: c,_3: d};
+   });
    var SortOldNoPin = {ctor: "SortOldNoPin"};
    var Remove = function (a) {    return {ctor: "Remove",_0: a};};
    var Add = function (a) {    return {ctor: "Add",_0: a};};
@@ -12175,7 +12171,7 @@ Elm.ItemList.make = function (_elm) {
       model.items)});
    });
    var getItem = F2(function (n,model) {
-      var item = $List.head(A2($List.drop,n - 1,model.items));
+      var item = $List.head(A2($List.drop,n,model.items));
       var _p6 = item;
       if (_p6.ctor === "Just") {
             return _p6._0;
@@ -12315,7 +12311,15 @@ Elm.ItemList.make = function (_elm) {
            $Item.update(_p22._1),
            _p22._0,
            model);
-         default: return sortOldNoPin(model);}
+         case "SortOldNoPin": return sortOldNoPin(model);
+         default: var updatedModel = A3(updateItem,
+           $Item.update(_p22._1),
+           _p22._0,
+           model);
+           return A3(updateItem,
+           $Item.update(_p22._3),
+           _p22._2,
+           updatedModel);}
    });
    var addMultipleItems = F2(function (items,model) {
       addMultipleItems: while (true) {
@@ -12379,6 +12383,7 @@ Elm.ItemList.make = function (_elm) {
                                  ,Add: Add
                                  ,Remove: Remove
                                  ,SortOldNoPin: SortOldNoPin
+                                 ,DoubleSubAction: DoubleSubAction
                                  ,update: update
                                  ,view: view};
 };
@@ -12415,6 +12420,10 @@ Elm.ItemFeed.make = function (_elm) {
          return A2($Signal.message,address,action);
       });
    });
+   var getSelectedItemList = function (model) {
+      return _U.cmp(model.selected,
+      $List.length(model.todoList.items) - 1) > 0 ? false : true;
+   };
    var help = F2(function (id,list) {
       help: while (true) {
          var _p1 = list;
@@ -12439,7 +12448,7 @@ Elm.ItemFeed.make = function (_elm) {
                  var _p5 = _p3._0;
                  var _p4 = _p3._1;
                  switch (_p4.ctor)
-                 {case "Pin": return _U.update(model,
+                 {case "TogglePin": return _U.update(model,
                       {todoList: function () {
                          var updatedTodoList = A2($ItemList.update,
                          _p6,
@@ -12447,15 +12456,7 @@ Elm.ItemFeed.make = function (_elm) {
                          return {items: $ItemList.sortPinnedUnpinned(updatedTodoList.items)
                                 ,nextItemId: model.todoList.nextItemId};
                       }()});
-                    case "Unpin": return _U.update(model,
-                      {todoList: function () {
-                         var updatedTodoList = A2($ItemList.update,
-                         _p6,
-                         model.todoList);
-                         return {items: $ItemList.sortPinnedUnpinned(updatedTodoList.items)
-                                ,nextItemId: model.todoList.nextItemId};
-                      }()});
-                    case "MarkAsDone": return _U.update(model,
+                    case "ToggleDone": return _U.update(model,
                       {doneList: function () {
                          var updatedTodoList = A2($ItemList.update,
                          _p6,
@@ -12467,7 +12468,6 @@ Elm.ItemFeed.make = function (_elm) {
                       ,todoList: A2($ItemList.update,
                       $ItemList.Remove(_p5),
                       model.todoList)});
-                    case "MarkUndone": return model;
                     default: return _U.update(model,
                       {todoList: A2($ItemList.update,_p6,model.todoList)});}
               } else {
@@ -12480,7 +12480,7 @@ Elm.ItemFeed.make = function (_elm) {
                  var _p9 = _p7._0;
                  var _p8 = _p7._1;
                  switch (_p8.ctor)
-                 {case "Pin": return _U.update(model,
+                 {case "TogglePin": return _U.update(model,
                       {doneList: function () {
                          var updatedDoneList = A2($ItemList.update,
                          _p10,
@@ -12488,16 +12488,7 @@ Elm.ItemFeed.make = function (_elm) {
                          return {items: $ItemList.sortPinnedUnpinned(updatedDoneList.items)
                                 ,nextItemId: model.doneList.nextItemId};
                       }()});
-                    case "Unpin": return _U.update(model,
-                      {doneList: function () {
-                         var updatedDoneList = A2($ItemList.update,
-                         _p10,
-                         model.doneList);
-                         return {items: $ItemList.sortPinnedUnpinned(updatedDoneList.items)
-                                ,nextItemId: model.doneList.nextItemId};
-                      }()});
-                    case "MarkAsDone": return model;
-                    case "MarkUndone": return _U.update(model,
+                    case "ToggleDone": return _U.update(model,
                       {todoList: function () {
                          var updatedDoneList = A2($ItemList.update,
                          _p10,
@@ -12518,12 +12509,78 @@ Elm.ItemFeed.make = function (_elm) {
          case "SaveContent": return _U.update(model,
            {reminderField: _p2._0});
          case "SaveDate": return _U.update(model,{reminderDate: _p2._0});
-         default: var _p13 = _p2._1;
-           return _p2._0 ? A2($Set.member,83,_p13) ? _U.update(model,
+         default: var _p22 = _p2._1;
+           return _p2._0 ? A2($Set.member,83,_p22) ? _U.update(model,
            {todoList: $ItemList.sortOldNoPin(model.todoList)
            ,doneList: $ItemList.sortOldNoPin(model.doneList)}) : A2($Set.member,
-           74,
-           _p13) ? _U.update(model,
+           79,
+           _p22) ? _U.update(model,
+           {todoList: function () {
+              if (getSelectedItemList(model)) {
+                    var _p11 = A2($ItemList.getItem,
+                    model.selected,
+                    model.todoList);
+                    var id = _p11._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.ToggleTruncate),
+                    model.todoList);
+                 } else return model.todoList;
+           }()
+           ,doneList: function () {
+              if (getSelectedItemList(model)) return model.doneList; else {
+                    var _p12 = A2($ItemList.getItem,
+                    model.selected - ($List.length(model.todoList.items) - 1),
+                    model.doneList);
+                    var id = _p12._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.ToggleTruncate),
+                    model.doneList);
+                 }
+           }()}) : A2($Set.member,80,_p22) ? _U.update(model,
+           {todoList: function () {
+              if (getSelectedItemList(model)) {
+                    var _p13 = A2($ItemList.getItem,
+                    model.selected,
+                    model.todoList);
+                    var id = _p13._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.TogglePin),
+                    model.todoList);
+                 } else return model.todoList;
+           }()
+           ,doneList: function () {
+              if (getSelectedItemList(model)) return model.doneList; else {
+                    var _p14 = A2($ItemList.getItem,
+                    model.selected - ($List.length(model.todoList.items) - 1),
+                    model.doneList);
+                    var id = _p14._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.TogglePin),
+                    model.doneList);
+                 }
+           }()}) : A2($Set.member,88,_p22) ? _U.update(model,
+           {todoList: function () {
+              if (getSelectedItemList(model)) {
+                    var _p15 = A2($ItemList.getItem,
+                    model.selected,
+                    model.todoList);
+                    var id = _p15._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.ToggleDone),
+                    model.todoList);
+                 } else return model.todoList;
+           }()
+           ,doneList: function () {
+              if (getSelectedItemList(model)) return model.doneList; else {
+                    var _p16 = A2($ItemList.getItem,
+                    model.selected - ($List.length(model.todoList.items) - 1),
+                    model.doneList);
+                    var id = _p16._0;
+                    return A2($ItemList.update,
+                    A2($ItemList.SubAction,id,$Item.ToggleDone),
+                    model.doneList);
+                 }
+           }()}) : A2($Set.member,74,_p22) ? _U.update(model,
            {selected: function () {
               var totalListLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
               return _U.eq(model.selected,
@@ -12532,22 +12589,45 @@ Elm.ItemFeed.make = function (_elm) {
            ,todoList: function () {
               if (_U.cmp($List.length(model.todoList.items) - 1,
               model.selected) > 0) {
-                    var _p11 = A2($ItemList.getItem,
+                    var _p17 = A2($ItemList.getItem,
+                    model.selected,
+                    model.todoList);
+                    var deselectId = _p17._0;
+                    var _p18 = A2($ItemList.getItem,
                     model.selected + 1,
                     model.todoList);
-                    var id = _p11._0;
+                    var selectId = _p18._0;
                     return A2($ItemList.update,
-                    A2($ItemList.SubAction,id,$Item.Select),
+                    A4($ItemList.DoubleSubAction,
+                    selectId,
+                    $Item.Select,
+                    deselectId,
+                    $Item.Deselect),
                     model.todoList);
-                 } else return model.todoList;
+                 } else if (_U.eq($List.length(model.todoList.items) - 1,
+                 model.selected) && $List.isEmpty(model.doneList.items)) {
+                       var _p19 = A2($ItemList.getItem,
+                       model.selected,
+                       model.todoList);
+                       var deselectId = _p19._0;
+                       var _p20 = A2($ItemList.getItem,0,model.todoList);
+                       var selectId = _p20._0;
+                       return A2($ItemList.update,
+                       A4($ItemList.DoubleSubAction,
+                       selectId,
+                       $Item.Select,
+                       deselectId,
+                       $Item.Deselect),
+                       model.todoList);
+                    } else return model.todoList;
            }()
            ,doneList: function () {
               if (_U.cmp($List.length(model.todoList.items) - 1,
               model.selected) < 1) {
-                    var _p12 = A2($ItemList.getItem,
+                    var _p21 = A2($ItemList.getItem,
                     model.selected + 1 - ($List.length(model.todoList.items) - 1),
                     model.doneList);
-                    var id = _p12._0;
+                    var id = _p21._0;
                     return A2($ItemList.update,
                     A2($ItemList.SubAction,id,$Item.Select),
                     model.doneList);
@@ -12662,6 +12742,7 @@ Elm.ItemFeed.make = function (_elm) {
                                  ,KeyPress: KeyPress
                                  ,help: help
                                  ,update: update
+                                 ,getSelectedItemList: getSelectedItemList
                                  ,view: view
                                  ,onEnter: onEnter
                                  ,is13: is13};

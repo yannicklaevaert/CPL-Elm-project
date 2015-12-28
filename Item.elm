@@ -46,12 +46,11 @@ newReminder reminderBody reminderDate = newItem (ReminderItem { body = reminderB
 --UPDATE
 
 type Action
-    = Pin
-    | Unpin
-    | MarkAsDone
-    | MarkUndone
-    | Truncate
-    | DisableTruncate
+    = TogglePin
+--    | MarkAsDone
+--    | MarkUndone
+    | ToggleDone
+    | ToggleTruncate
     | Select
     | Deselect
 
@@ -60,23 +59,26 @@ type Action
 update : Action -> Model -> Model
 update action model =
   case action of
-    Pin ->
-      { model | pinned = True }
+    TogglePin ->
+      { model | pinned = if model.pinned
+                            then False
+                            else True }
 
-    Unpin ->
-      { model | pinned = False }
-
-    MarkAsDone ->
+{-    MarkAsDone ->
       { model | done = True }
 
     MarkUndone ->
       { model | done = False }
+-}
+    ToggleDone ->
+      { model | done = if model.done
+                       then False
+                       else True }
 
-    Truncate ->
-      { model | truncated = True }
-
-    DisableTruncate ->
-      { model | truncated = False }
+    ToggleTruncate ->
+      { model | truncated = if model.truncated
+                            then False
+                            else True }
 
     Select ->
       { model | selected = True }
@@ -119,17 +121,19 @@ view address model =
         , Html.p []
           [ if model.done == False
             then Html.button
-                [ E.onClick address MarkAsDone ]
+--                [ E.onClick address MarkAsDone ]
+                [ E.onClick address ToggleDone ]
                 [ Html.text "Mark as Done" ]
             else Html.button
-                [ E.onClick address MarkUndone ]
+--                [ E.onClick address MarkUndone ]
+                [ E.onClick address ToggleDone ]
                 [ Html.text "Undo" ]
           , if model.pinned == False
             then Html.button
-                [ E.onClick address Pin ]
+                [ E.onClick address TogglePin ]
                 [ Html.text "Pin" ]
             else Html.button
-                [ E.onClick address Unpin ]
+                [ E.onClick address TogglePin ]
                 [ Html.text "Unpin" ]
           ]
           , Html.p [] [Html.text <| "date: " ++ reminder.created]
@@ -163,25 +167,27 @@ view address model =
           [ if String.length email.body >= 200
             then (if model.truncated == False
                  then Html.button
-                    [ E.onClick address Truncate ]
+                    [ E.onClick address ToggleTruncate ]
                     [ Html.text "Less" ]
                  else Html.button
-                    [ E.onClick address DisableTruncate ]
+                    [ E.onClick address ToggleTruncate ]
                     [ Html.text "More" ])
             else Html.p [] []
           , if model.done == False
             then Html.button
-                  [ E.onClick address MarkAsDone ]
+--                  [ E.onClick address MarkAsDone ]
+                  [ E.onClick address ToggleDone ]
                   [ Html.text "Mark as Done" ]
             else Html.button
-                  [ E.onClick address MarkUndone ]
+--                  [ E.onClick address MarkUndone ]
+                  [ E.onClick address ToggleDone ]
                   [ Html.text "Undo" ]
           , if model.pinned == False
             then Html.button
-                  [ E.onClick address Pin ]
+                  [ E.onClick address TogglePin ]
                   [ Html.text "Pin" ]
             else Html.button
-                  [ E.onClick address Unpin ]
+                  [ E.onClick address TogglePin ]
                   [ Html.text "Unpin" ]
           ]
           , Html.p [] [Html.text <| "date: " ++ email.date]

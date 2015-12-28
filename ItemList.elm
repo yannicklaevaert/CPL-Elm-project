@@ -112,7 +112,7 @@ sortOldNoPin : Model -> Model
 sortOldNoPin model = { model | items = sortIdItems model.items [] False}
 
 getItem : Int -> Model -> (Id, Item.Model)
-getItem n model = let item = List.head (List.drop (n-1) model.items)
+getItem n model = let item = List.head (List.drop n model.items)
                   in case item of
                       Just a -> a
                       _ -> (987654321, Item.dummyItem)
@@ -138,6 +138,7 @@ type Action = SubAction Id Item.Action
               | Add Item.Model
               | Remove Id
               | SortOldNoPin
+              | DoubleSubAction Id Item.Action Id Item.Action
 
 update : Action -> Model -> Model
 update action model =
@@ -150,6 +151,9 @@ update action model =
       updateItem (Item.update action) id model
     SortOldNoPin ->
       sortOldNoPin model
+    DoubleSubAction firstId firstAction secondId secondAction ->
+      let updatedModel = updateItem (Item.update firstAction) firstId model
+      in updateItem (Item.update secondAction) secondId updatedModel
 
 
 view : Signal.Address Action -> Model -> Html

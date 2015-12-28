@@ -19,24 +19,20 @@ Elm.Item.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "Pin": return _U.update(model,{pinned: true});
-         case "Unpin": return _U.update(model,{pinned: false});
-         case "MarkAsDone": return _U.update(model,{done: true});
-         case "MarkUndone": return _U.update(model,{done: false});
-         case "Truncate": return _U.update(model,{truncated: true});
-         case "DisableTruncate": return _U.update(model,
-           {truncated: false});
+      {case "TogglePin": return _U.update(model,
+           {pinned: model.pinned ? false : true});
+         case "ToggleDone": return _U.update(model,
+           {done: model.done ? false : true});
+         case "ToggleTruncate": return _U.update(model,
+           {truncated: model.truncated ? false : true});
          case "Select": return _U.update(model,{selected: true});
          default: return _U.update(model,{selected: false});}
    });
    var Deselect = {ctor: "Deselect"};
    var Select = {ctor: "Select"};
-   var DisableTruncate = {ctor: "DisableTruncate"};
-   var Truncate = {ctor: "Truncate"};
-   var MarkUndone = {ctor: "MarkUndone"};
-   var MarkAsDone = {ctor: "MarkAsDone"};
-   var Unpin = {ctor: "Unpin"};
-   var Pin = {ctor: "Pin"};
+   var ToggleTruncate = {ctor: "ToggleTruncate"};
+   var ToggleDone = {ctor: "ToggleDone"};
+   var TogglePin = {ctor: "TogglePin"};
    var view = F2(function (address,model) {
       var _p1 = model.itemType;
       if (_p1.ctor === "ReminderItem") {
@@ -58,14 +54,14 @@ Elm.Item.make = function (_elm) {
                     ,A2($Html.p,
                     _U.list([]),
                     _U.list([_U.eq(model.done,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Undo")]))
                             ,_U.eq(model.pinned,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Pin")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Unpin")]))]))
                     ,A2($Html.p,
                     _U.list([]),
@@ -112,21 +108,21 @@ Elm.Item.make = function (_elm) {
                     _U.list([]),
                     _U.list([_U.cmp($String.length(_p4.body),
                             200) > -1 ? _U.eq(model.truncated,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Truncate)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleTruncate)]),
                             _U.list([$Html.text("Less")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,DisableTruncate)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleTruncate)]),
                             _U.list([$Html.text("More")])) : A2($Html.p,
                             _U.list([]),
                             _U.list([]))
                             ,_U.eq(model.done,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Undo")]))
                             ,_U.eq(model.pinned,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Pin")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Unpin")]))]))
                     ,A2($Html.p,
                     _U.list([]),
@@ -176,12 +172,9 @@ Elm.Item.make = function (_elm) {
                              ,dummyItem: dummyItem
                              ,newItem: newItem
                              ,newReminder: newReminder
-                             ,Pin: Pin
-                             ,Unpin: Unpin
-                             ,MarkAsDone: MarkAsDone
-                             ,MarkUndone: MarkUndone
-                             ,Truncate: Truncate
-                             ,DisableTruncate: DisableTruncate
+                             ,TogglePin: TogglePin
+                             ,ToggleDone: ToggleDone
+                             ,ToggleTruncate: ToggleTruncate
                              ,Select: Select
                              ,Deselect: Deselect
                              ,update: update

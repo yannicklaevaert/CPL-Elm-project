@@ -14,6 +14,9 @@ Elm.ItemList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Static = Elm.Static.make(_elm);
    var _op = {};
+   var DoubleSubAction = F4(function (a,b,c,d) {
+      return {ctor: "DoubleSubAction",_0: a,_1: b,_2: c,_3: d};
+   });
    var SortOldNoPin = {ctor: "SortOldNoPin"};
    var Remove = function (a) {    return {ctor: "Remove",_0: a};};
    var Add = function (a) {    return {ctor: "Add",_0: a};};
@@ -50,7 +53,7 @@ Elm.ItemList.make = function (_elm) {
       model.items)});
    });
    var getItem = F2(function (n,model) {
-      var item = $List.head(A2($List.drop,n - 1,model.items));
+      var item = $List.head(A2($List.drop,n,model.items));
       var _p6 = item;
       if (_p6.ctor === "Just") {
             return _p6._0;
@@ -190,7 +193,15 @@ Elm.ItemList.make = function (_elm) {
            $Item.update(_p22._1),
            _p22._0,
            model);
-         default: return sortOldNoPin(model);}
+         case "SortOldNoPin": return sortOldNoPin(model);
+         default: var updatedModel = A3(updateItem,
+           $Item.update(_p22._1),
+           _p22._0,
+           model);
+           return A3(updateItem,
+           $Item.update(_p22._3),
+           _p22._2,
+           updatedModel);}
    });
    var addMultipleItems = F2(function (items,model) {
       addMultipleItems: while (true) {
@@ -254,6 +265,7 @@ Elm.ItemList.make = function (_elm) {
                                  ,Add: Add
                                  ,Remove: Remove
                                  ,SortOldNoPin: SortOldNoPin
+                                 ,DoubleSubAction: DoubleSubAction
                                  ,update: update
                                  ,view: view};
 };
