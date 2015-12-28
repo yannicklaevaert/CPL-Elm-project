@@ -17,9 +17,13 @@ Elm.ItemList.make = function (_elm) {
    var DoubleSubAction = F4(function (a,b,c,d) {
       return {ctor: "DoubleSubAction",_0: a,_1: b,_2: c,_3: d};
    });
-   var SortOldNoPin = {ctor: "SortOldNoPin"};
+   var SortNewWithPin = {ctor: "SortNewWithPin"};
+   var SortOldWithoutPin = {ctor: "SortOldWithoutPin"};
    var Remove = function (a) {    return {ctor: "Remove",_0: a};};
-   var Add = function (a) {    return {ctor: "Add",_0: a};};
+   var AddItem = F2(function (a,b) {
+      return {ctor: "AddItem",_0: a,_1: b};
+   });
+   var AddNew = function (a) {    return {ctor: "AddNew",_0: a};};
    var SubAction = F2(function (a,b) {
       return {ctor: "SubAction",_0: a,_1: b};
    });
@@ -53,7 +57,7 @@ Elm.ItemList.make = function (_elm) {
       model.items)});
    });
    var getItem = F2(function (n,model) {
-      var item = $List.head(A2($List.drop,n,model.items));
+      var item = $List.head(A2($List.drop,n - 1,model.items));
       var _p6 = item;
       if (_p6.ctor === "Just") {
             return _p6._0;
@@ -125,7 +129,7 @@ Elm.ItemList.make = function (_elm) {
             }
       }
    });
-   var sortOldNoPin = function (model) {
+   var sortOldWithoutPin = function (model) {
       return _U.update(model,
       {items: A3(sortIdItems,model.items,_U.list([]),false)});
    };
@@ -173,27 +177,33 @@ Elm.ItemList.make = function (_elm) {
          return A3(sortPinnedHelp,unsorted,_U.list([]),_U.list([]));
       }()});
    };
-   var sortPinnedUnpinned = function (unsorted) {
-      return A3(sortPinnedHelp,unsorted,_U.list([]),_U.list([]));
-   };
-   var addItem = F2(function (item,model) {
+   var addNewItem = F2(function (item,model) {
       var newId = model.nextItemId;
-      return _U.update(model,
-      {items: sortPinnedUnpinned(A2($List._op["::"],
-      {ctor: "_Tuple2",_0: newId,_1: item},
-      model.items))
-      ,nextItemId: newId + 1});
+      var newModel = {items: A2($List._op["::"],
+                     {ctor: "_Tuple2",_0: newId,_1: item},
+                     model.items)
+                     ,nextItemId: newId + 1};
+      return sortNewWithPin(newModel);
+   });
+   var addItem = F3(function (id,item,model) {
+      var newModel = {items: A2($List._op["::"],
+                     {ctor: "_Tuple2",_0: id,_1: item},
+                     model.items)
+                     ,nextItemId: model.nextItemId};
+      return sortNewWithPin(newModel);
    });
    var update = F2(function (action,model) {
       var _p22 = action;
       switch (_p22.ctor)
-      {case "Add": return A2(addItem,_p22._0,model);
+      {case "AddNew": return A2(addNewItem,_p22._0,model);
+         case "AddItem": return A3(addItem,_p22._0,_p22._1,model);
          case "Remove": return A2(removeItem,_p22._0,model);
          case "SubAction": return A3(updateItem,
            $Item.update(_p22._1),
            _p22._0,
            model);
-         case "SortOldNoPin": return sortOldNoPin(model);
+         case "SortOldWithoutPin": return sortOldWithoutPin(model);
+         case "SortNewWithPin": return sortNewWithPin(model);
          default: var updatedModel = A3(updateItem,
            $Item.update(_p22._1),
            _p22._0,
@@ -209,7 +219,7 @@ Elm.ItemList.make = function (_elm) {
          if (_p23.ctor === "[]") {
                return model;
             } else {
-               var newModel = A2(addItem,_p23._0,model);
+               var newModel = A2(addNewItem,_p23._0,model);
                var _v20 = _p23._1,_v21 = newModel;
                items = _v20;
                model = _v21;
@@ -251,20 +261,22 @@ Elm.ItemList.make = function (_elm) {
                                  ,sortItems: sortItems
                                  ,init: init
                                  ,addMultipleItems: addMultipleItems
-                                 ,sortPinnedUnpinned: sortPinnedUnpinned
                                  ,sortPinnedHelp: sortPinnedHelp
                                  ,sortIdItems: sortIdItems
                                  ,placeIdItem: placeIdItem
                                  ,sortNewWithPin: sortNewWithPin
-                                 ,sortOldNoPin: sortOldNoPin
+                                 ,sortOldWithoutPin: sortOldWithoutPin
                                  ,getItem: getItem
+                                 ,addNewItem: addNewItem
                                  ,addItem: addItem
                                  ,removeItem: removeItem
                                  ,updateItem: updateItem
                                  ,SubAction: SubAction
-                                 ,Add: Add
+                                 ,AddNew: AddNew
+                                 ,AddItem: AddItem
                                  ,Remove: Remove
-                                 ,SortOldNoPin: SortOldNoPin
+                                 ,SortOldWithoutPin: SortOldWithoutPin
+                                 ,SortNewWithPin: SortNewWithPin
                                  ,DoubleSubAction: DoubleSubAction
                                  ,update: update
                                  ,view: view};

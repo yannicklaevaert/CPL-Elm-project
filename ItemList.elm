@@ -61,11 +61,11 @@ addMultipleItems : List Item.Model -> Model -> Model
 addMultipleItems items model =
   case items of
     [] -> model
-    item::rest -> let newModel = addItem item model
+    item::rest -> let newModel = addNewItem item model
                   in addMultipleItems rest newModel
 
-sortPinnedUnpinned : List (Id, Item.Model) -> List (Id, Item.Model)
-sortPinnedUnpinned unsorted = sortPinnedHelp unsorted [] []
+--sortPinnedUnpinned : List (Id, Item.Model) -> List (Id, Item.Model)
+--sortPinnedUnpinned unsorted = sortPinnedHelp unsorted [] []
 
 sortPinnedHelp : List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
 sortPinnedHelp unsorted pinnedList unpinnedList =
@@ -108,20 +108,26 @@ sortNewWithPin : Model -> Model
 sortNewWithPin model = { model | items = let unsorted = model.items
                                      in sortPinnedHelp unsorted [] [] }
 
-sortOldNoPin : Model -> Model
-sortOldNoPin model = { model | items = sortIdItems model.items [] False}
+sortOldWithoutPin : Model -> Model
+sortOldWithoutPin model = { model | items = sortIdItems model.items [] False}
 
 getItem : Int -> Model -> (Id, Item.Model)
-getItem n model = let item = List.head (List.drop n model.items)
+getItem n model = let item = List.head (List.drop (n-1) model.items)
                   in case item of
                       Just a -> a
                       _ -> (987654321, Item.dummyItem)
 
-addItem : Item.Model -> Model -> Model
-addItem item model =
+addNewItem : Item.Model -> Model -> Model
+addNewItem item model =
   let newId = model.nextItemId
-  in { model | items = sortPinnedUnpinned((newId, item)::(model.items)),
-               nextItemId = newId + 1}
+  in let newModel = { items = (newId, item)::(model.items),
+                      nextItemId = newId + 1}
+     in sortNewWithPin newModel
+
+addItem : Id -> Item.Model -> Model -> Model
+addItem id item model = let newModel = { items = (id, item)::(model.items),
+                                         nextItemId = model.nextItemId }
+                        in sortNewWithPin newModel
 
 removeItem : Id -> Model -> Model
 removeItem id model =
@@ -135,22 +141,28 @@ updateItem f id model =
 -- UPDATE
 
 type Action = SubAction Id Item.Action
-              | Add Item.Model
+              | AddNew Item.Model
+              | AddItem Id Item.Model
               | Remove Id
-              | SortOldNoPin
+              | SortOldWithoutPin
+              | SortNewWithPin
               | DoubleSubAction Id Item.Action Id Item.Action
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    Add item ->
-      addItem item model
+    AddNew item ->
+      addNewItem item model
+    AddItem id item ->
+      addItem id item model
     Remove id ->
       removeItem id model
     SubAction id action ->
       updateItem (Item.update action) id model
-    SortOldNoPin ->
-      sortOldNoPin model
+    SortOldWithoutPin ->
+      sortOldWithoutPin model
+    SortNewWithPin ->
+      sortNewWithPin model
     DoubleSubAction firstId firstAction secondId secondAction ->
       let updatedModel = updateItem (Item.update firstAction) firstId model
       in updateItem (Item.update secondAction) secondId updatedModel

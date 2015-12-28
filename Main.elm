@@ -82,7 +82,7 @@ state =
           Just a -> ItemFeed.update a model
           _ -> model
 --  in Signal.foldp update ItemFeed.init mailbox.signal
-    in Signal.foldp update ItemFeed.init inputs
+  in Signal.foldp update ItemFeed.init inputs
 
 inputs = Signal.merge mailbox.signal (Signal.map Just (Signal.map2  ItemFeed.KeyPress Keyboard.alt Keyboard.keysDown))
 
