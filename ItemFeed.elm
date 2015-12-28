@@ -138,6 +138,7 @@ update action model =
                                      else let (id, _) = ItemList.getItem (model.selected - (List.length (model.todoList).items - 1)) model.doneList
                                           in ItemList.update (ItemList.SubAction id Item.TogglePin) model.doneList }
       -- "x" has keycode 88
+-- TODO KLOPT HELEMAAL NOG NIET -> Beide lijsten moeten geupdate worden
            else if Set.member 88 keyCodes
            then { model | todoList = if getSelectedItemList model
                                      then let (id, _) = ItemList.getItem model.selected model.todoList
@@ -148,28 +149,34 @@ update action model =
                                      else let (id, _) = ItemList.getItem (model.selected - (List.length (model.todoList).items - 1)) model.doneList
                                           in ItemList.update (ItemList.SubAction id Item.ToggleDone) model.doneList }
       -- "j" has keycode 74
+-- TODO KLOPT HELEMAAL NOG NIET
            else if Set.member 74 keyCodes
-                then { model | selected = let totalListLength = List.length (model.todoList).items + List.length (model.doneList).items
-                                          in if model.selected == totalListLength - 1
-                                             then 0
-                                             else model.selected + 1,
-                               todoList = if List.length (model.todoList).items - 1 > model.selected
-                                          then let (selectId, _) = ItemList.getItem (model.selected + 1) model.todoList
+           then { model | selected = let totalListLength = List.length (model.todoList).items + List.length (model.doneList).items
+                                     in if model.selected == totalListLength - 1
+                                        then 0
+                                        else model.selected + 1,
+                          todoList = if List.length (model.todoList).items - 1 > model.selected
+                                     then let (selectId, _) = ItemList.getItem (model.selected + 1) model.todoList
+                                              (deselectId, _) = ItemList.getItem (model.selected) model.todoList
+                                          in ItemList.update (ItemList.DoubleSubAction selectId Item.Select deselectId Item.Deselect) model.todoList
+                                     else if (List.length (model.todoList).items - 1 == model.selected && List.isEmpty (model.doneList).items)
+                                          then let (selectId, _) = ItemList.getItem 0 model.todoList
                                                    (deselectId, _) = ItemList.getItem (model.selected) model.todoList
                                                in ItemList.update (ItemList.DoubleSubAction selectId Item.Select deselectId Item.Deselect) model.todoList
-                                          else if (List.length (model.todoList).items - 1 == model.selected && List.isEmpty (model.doneList).items)
-                                               then let (selectId, _) = ItemList.getItem 0 model.todoList
-                                                        (deselectId, _) = ItemList.getItem (model.selected) model.todoList
-                                                    in ItemList.update (ItemList.DoubleSubAction selectId Item.Select deselectId Item.Deselect) model.todoList
-                                               else model.todoList,
-                               doneList = if List.length (model.todoList).items - 1 <= model.selected
-                                          then let (id, _) = ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items - 1) ) model.doneList
-                                               in ItemList.update (ItemList.SubAction id Item.Select) model.doneList
-                                          else model.doneList }
-                else { model | todoList = ItemList.sortNewWithPin model.todoList,
-                               doneList = ItemList.sortNewWithPin model.doneList }
+                                          else model.todoList,
+                          doneList = if List.length (model.todoList).items - 1 <= model.selected
+                                     then let (id, _) = ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items - 1) ) model.doneList
+                                          in ItemList.update (ItemList.SubAction id Item.Select) model.doneList
+                                     else model.doneList }
+        -- "k" has keycode 75
+-- TODO KLOPT HELEMAAL NOG NIET
+          else if Set.member 75 keyCodes
+          then model
+          else { model | todoList = ItemList.sortNewWithPin model.todoList,
+                         doneList = ItemList.sortNewWithPin model.doneList }
       else { model | todoList = ItemList.sortNewWithPin model.todoList,
                      doneList = ItemList.sortNewWithPin model.doneList }
+
 
 getSelectedItemList : Model -> Bool
 getSelectedItemList model = if model.selected > List.length (model.todoList).items - 1

@@ -243,7 +243,7 @@ Elm.ItemFeed.make = function (_elm) {
                     A2($ItemList.SubAction,id,$Item.Select),
                     model.doneList);
                  } else return model.doneList;
-           }()}) : _U.update(model,
+           }()}) : A2($Set.member,75,_p22) ? model : _U.update(model,
            {todoList: $ItemList.sortNewWithPin(model.todoList)
            ,doneList: $ItemList.sortNewWithPin(model.doneList)}) : _U.update(model,
            {todoList: $ItemList.sortNewWithPin(model.todoList)
