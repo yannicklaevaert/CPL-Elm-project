@@ -32,43 +32,6 @@ Elm.ItemFeed.make = function (_elm) {
          return A2($Signal.message,address,action);
       });
    });
-   var update = F2(function (action,model) {
-      var _p1 = action;
-      switch (_p1.ctor)
-      {case "TodoDoneListPair": return _U.update(model,
-           {todoDoneListPair: A2($ItemListPair.update,
-           _p1._0,
-           model.todoDoneListPair)});
-         case "SaveContent": return _U.update(model,
-           {reminderField: _p1._0});
-         case "SaveDate": return _U.update(model,{reminderDate: _p1._0});
-         default: var _p2 = _p1._1;
-           return _p1._0 ? A2($Set.member,83,_p2) ? _U.update(model,
-           {todoDoneListPair: A2($ItemListPair.update,
-           $ItemListPair.SortOldWithoutPin,
-           model.todoDoneListPair)}) : A2($Set.member,
-           79,
-           _p2) ? _U.update(model,
-           {todoDoneListPair: A2($ItemListPair.update,
-           $ItemListPair.UpdateSelectedItem($Item.ToggleTruncate),
-           model.todoDoneListPair)}) : A2($Set.member,
-           80,
-           _p2) ? _U.update(model,
-           {todoDoneListPair: A2($ItemListPair.update,
-           $ItemListPair.UpdateSelectedItem($Item.TogglePin),
-           model.todoDoneListPair)}) : A2($Set.member,
-           88,
-           _p2) ? _U.update(model,
-           {todoDoneListPair: A2($ItemListPair.update,
-           $ItemListPair.UpdateSelectedItem($Item.ToggleDone),
-           model.todoDoneListPair)}) : _U.update(model,
-           {todoDoneListPair: A2($ItemListPair.update,
-           $ItemListPair.SortNewWithPin,
-           model.todoDoneListPair)}) : _U.update(model,
-           {todoDoneListPair: A2($ItemListPair.update,
-           $ItemListPair.SortNewWithPin,
-           model.todoDoneListPair)});}
-   });
    var KeyPress = F2(function (a,b) {
       return {ctor: "KeyPress",_0: a,_1: b};
    });
@@ -133,19 +96,238 @@ Elm.ItemFeed.make = function (_elm) {
               model.reminderDate)))))]),
               _U.list([$Html.text("Add")]))]));
    });
+   var getNextItem = function (model) {
+      return $ItemListPair.getNextItem(model.todoDoneListPair);
+   };
+   var getNextItemList = function (model) {
+      return $ItemListPair.getNextItemList(model.todoDoneListPair);
+   };
+   var getPreviousItem = function (model) {
+      return $ItemListPair.getPreviousItem(model.todoDoneListPair);
+   };
+   var getPreviousItemList = function (model) {
+      return $ItemListPair.getPreviousItemList(model.todoDoneListPair);
+   };
+   var getSelectedItem = function (model) {
+      return $ItemListPair.getSelectedItem(model.todoDoneListPair);
+   };
+   var getSelectedItemList = function (model) {
+      return $ItemListPair.getSelectedItemList(model.todoDoneListPair);
+   };
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      switch (_p1.ctor)
+      {case "TodoDoneListPair": return _U.update(model,
+           {todoDoneListPair: A2($ItemListPair.update,
+           _p1._0,
+           model.todoDoneListPair)});
+         case "SaveContent": return _U.update(model,
+           {reminderField: _p1._0});
+         case "SaveDate": return _U.update(model,{reminderDate: _p1._0});
+         default: var _p9 = _p1._1;
+           return _p1._0 ? A2($Set.member,83,_p9) ? _U.update(model,
+           {todoDoneListPair: function () {
+              var newPair = A2($ItemListPair.update,
+              $ItemListPair.TodoList($ItemList.SortOldWithoutPin),
+              model.todoDoneListPair);
+              return A2($ItemListPair.update,
+              $ItemListPair.DoneList($ItemList.SortOldWithoutPin),
+              newPair);
+           }()}) : A2($Set.member,79,_p9) ? _U.update(model,
+           {todoDoneListPair: function () {
+              var _p2 = getSelectedItem(model);
+              var id = _p2._0;
+              return getSelectedItemList(model) ? A2($ItemListPair.update,
+              $ItemListPair.TodoList(A2($ItemList.SubAction,
+              id,
+              $Item.ToggleTruncate)),
+              model.todoDoneListPair) : A2($ItemListPair.update,
+              $ItemListPair.DoneList(A2($ItemList.SubAction,
+              id,
+              $Item.ToggleTruncate)),
+              model.todoDoneListPair);
+           }()}) : A2($Set.member,80,_p9) ? _U.update(model,
+           {todoDoneListPair: function () {
+              var _p3 = getSelectedItem(model);
+              var id = _p3._0;
+              return getSelectedItemList(model) ? A2($ItemListPair.update,
+              $ItemListPair.TodoList(A2($ItemList.SubAction,
+              id,
+              $Item.TogglePin)),
+              model.todoDoneListPair) : A2($ItemListPair.update,
+              $ItemListPair.DoneList(A2($ItemList.SubAction,
+              id,
+              $Item.TogglePin)),
+              model.todoDoneListPair);
+           }()}) : A2($Set.member,88,_p9) ? _U.update(model,
+           {todoDoneListPair: function () {
+              var _p4 = getSelectedItem(model);
+              var id = _p4._0;
+              return getSelectedItemList(model) ? A2($ItemListPair.update,
+              $ItemListPair.TodoList(A2($ItemList.SubAction,
+              id,
+              $Item.ToggleDone)),
+              model.todoDoneListPair) : A2($ItemListPair.update,
+              $ItemListPair.DoneList(A2($ItemList.SubAction,
+              id,
+              $Item.ToggleDone)),
+              model.todoDoneListPair);
+           }()}) : A2($Set.member,74,_p9) ? _U.update(model,
+           {todoDoneListPair: function () {
+              var _p5 = getSelectedItem(model);
+              var currentId = _p5._0;
+              var _p6 = getNextItem(model);
+              var nextId = _p6._0;
+              var updatedPair = function () {
+                 if (getNextItemList(model) && getSelectedItemList(model)) {
+                       var newPair = A2($ItemListPair.update,
+                       $ItemListPair.TodoList(A2($ItemList.SubAction,
+                       nextId,
+                       $Item.ToggleSelect)),
+                       model.todoDoneListPair);
+                       return A2($ItemListPair.update,
+                       $ItemListPair.TodoList(A2($ItemList.SubAction,
+                       currentId,
+                       $Item.ToggleSelect)),
+                       newPair);
+                    }
+                 else if (getNextItemList(model) && $Basics.not(getSelectedItemList(model)))
+                    {
+                          var newPair = A2($ItemListPair.update,
+                          $ItemListPair.TodoList(A2($ItemList.SubAction,
+                          nextId,
+                          $Item.ToggleSelect)),
+                          model.todoDoneListPair);
+                          return A2($ItemListPair.update,
+                          $ItemListPair.DoneList(A2($ItemList.SubAction,
+                          currentId,
+                          $Item.ToggleSelect)),
+                          newPair);
+                       }
+                    else if ($Basics.not(getNextItemList(model)) && getSelectedItemList(model))
+                       {
+                             var newPair = A2($ItemListPair.update,
+                             $ItemListPair.DoneList(A2($ItemList.SubAction,
+                             nextId,
+                             $Item.ToggleSelect)),
+                             model.todoDoneListPair);
+                             return A2($ItemListPair.update,
+                             $ItemListPair.TodoList(A2($ItemList.SubAction,
+                             currentId,
+                             $Item.ToggleSelect)),
+                             newPair);
+                          } else {
+                             var newPair = A2($ItemListPair.update,
+                             $ItemListPair.DoneList(A2($ItemList.SubAction,
+                             nextId,
+                             $Item.ToggleSelect)),
+                             model.todoDoneListPair);
+                             return A2($ItemListPair.update,
+                             $ItemListPair.DoneList(A2($ItemList.SubAction,
+                             currentId,
+                             $Item.ToggleSelect)),
+                             newPair);
+                          }
+              }();
+              return A2($ItemListPair.update,
+              $ItemListPair.SelectNext,
+              updatedPair);
+           }()}) : A2($Set.member,75,_p9) ? _U.update(model,
+           {todoDoneListPair: function () {
+              var _p7 = getSelectedItem(model);
+              var currentId = _p7._0;
+              var _p8 = getPreviousItem(model);
+              var previousId = _p8._0;
+              var updatedPair = function () {
+                 if (getPreviousItemList(model) && getSelectedItemList(model))
+                 {
+                       var newPair = A2($ItemListPair.update,
+                       $ItemListPair.TodoList(A2($ItemList.SubAction,
+                       previousId,
+                       $Item.ToggleSelect)),
+                       model.todoDoneListPair);
+                       return A2($ItemListPair.update,
+                       $ItemListPair.TodoList(A2($ItemList.SubAction,
+                       currentId,
+                       $Item.ToggleSelect)),
+                       newPair);
+                    }
+                 else if (getPreviousItemList(model) && $Basics.not(getSelectedItemList(model)))
+                    {
+                          var newPair = A2($ItemListPair.update,
+                          $ItemListPair.TodoList(A2($ItemList.SubAction,
+                          previousId,
+                          $Item.ToggleSelect)),
+                          model.todoDoneListPair);
+                          return A2($ItemListPair.update,
+                          $ItemListPair.DoneList(A2($ItemList.SubAction,
+                          currentId,
+                          $Item.ToggleSelect)),
+                          newPair);
+                       }
+                    else if ($Basics.not(getPreviousItemList(model)) && getSelectedItemList(model))
+                       {
+                             var newPair = A2($ItemListPair.update,
+                             $ItemListPair.DoneList(A2($ItemList.SubAction,
+                             previousId,
+                             $Item.ToggleSelect)),
+                             model.todoDoneListPair);
+                             return A2($ItemListPair.update,
+                             $ItemListPair.TodoList(A2($ItemList.SubAction,
+                             currentId,
+                             $Item.ToggleSelect)),
+                             newPair);
+                          } else {
+                             var newPair = A2($ItemListPair.update,
+                             $ItemListPair.DoneList(A2($ItemList.SubAction,
+                             previousId,
+                             $Item.ToggleSelect)),
+                             model.todoDoneListPair);
+                             return A2($ItemListPair.update,
+                             $ItemListPair.DoneList(A2($ItemList.SubAction,
+                             currentId,
+                             $Item.ToggleSelect)),
+                             newPair);
+                          }
+              }();
+              return A2($ItemListPair.update,
+              $ItemListPair.SelectPrevious,
+              updatedPair);
+           }()}) : _U.update(model,
+           {todoDoneListPair: function () {
+              var newPair = A2($ItemListPair.update,
+              $ItemListPair.TodoList($ItemList.SortNewWithPin),
+              model.todoDoneListPair);
+              return A2($ItemListPair.update,
+              $ItemListPair.DoneList($ItemList.SortNewWithPin),
+              newPair);
+           }()}) : _U.update(model,
+           {todoDoneListPair: function () {
+              var newPair = A2($ItemListPair.update,
+              $ItemListPair.TodoList($ItemList.SortNewWithPin),
+              model.todoDoneListPair);
+              return A2($ItemListPair.update,
+              $ItemListPair.DoneList($ItemList.SortNewWithPin),
+              newPair);
+           }()});}
+   });
    var init = {todoDoneListPair: $ItemListPair.init
               ,reminderField: ""
-              ,reminderDate: "2015-01-01"
-              ,selected: 0};
-   var Model = F4(function (a,b,c,d) {
+              ,reminderDate: "2015-01-01"};
+   var Model = F3(function (a,b,c) {
       return {todoDoneListPair: a
              ,reminderField: b
-             ,reminderDate: c
-             ,selected: d};
+             ,reminderDate: c};
    });
    return _elm.ItemFeed.values = {_op: _op
                                  ,Model: Model
                                  ,init: init
+                                 ,getSelectedItemList: getSelectedItemList
+                                 ,getSelectedItem: getSelectedItem
+                                 ,getPreviousItemList: getPreviousItemList
+                                 ,getPreviousItem: getPreviousItem
+                                 ,getNextItemList: getNextItemList
+                                 ,getNextItem: getNextItem
                                  ,TodoDoneListPair: TodoDoneListPair
                                  ,SaveContent: SaveContent
                                  ,SaveDate: SaveDate

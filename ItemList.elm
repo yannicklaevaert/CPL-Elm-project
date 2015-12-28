@@ -112,7 +112,7 @@ sortOldWithoutPin : Model -> Model
 sortOldWithoutPin model = { model | items = sortIdItems model.items [] False}
 
 getItem : Int -> Model -> (Id, Item.Model)
-getItem n model = let item = List.head (List.drop (n-1) model.items)
+getItem n model = let item = List.head (List.drop n model.items)
                   in case item of
                       Just a -> a
                       _ -> (987654321, Item.dummyItem)

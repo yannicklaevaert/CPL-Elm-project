@@ -57,7 +57,7 @@ Elm.ItemList.make = function (_elm) {
       model.items)});
    });
    var getItem = F2(function (n,model) {
-      var item = $List.head(A2($List.drop,n - 1,model.items));
+      var item = $List.head(A2($List.drop,n,model.items));
       var _p6 = item;
       if (_p6.ctor === "Just") {
             return _p6._0;

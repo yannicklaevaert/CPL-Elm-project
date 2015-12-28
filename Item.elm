@@ -47,12 +47,9 @@ newReminder reminderBody reminderDate = newItem (ReminderItem { body = reminderB
 
 type Action
     = TogglePin
---    | MarkAsDone
---    | MarkUndone
     | ToggleDone
     | ToggleTruncate
-    | Select
-    | Deselect
+    | ToggleSelect
 
 
 
@@ -64,12 +61,6 @@ update action model =
                             then False
                             else True }
 
-{-    MarkAsDone ->
-      { model | done = True }
-
-    MarkUndone ->
-      { model | done = False }
--}
     ToggleDone ->
       { model | done = if model.done
                        then False
@@ -80,11 +71,10 @@ update action model =
                             then False
                             else True }
 
-    Select ->
-      { model | selected = True }
-
-    Deselect ->
-      { model | selected = False }
+    ToggleSelect ->
+      { model | selected = if model.selected
+                           then False
+                           else True }
 
 
 

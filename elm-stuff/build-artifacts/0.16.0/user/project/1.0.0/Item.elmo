@@ -25,11 +25,10 @@ Elm.Item.make = function (_elm) {
            {done: model.done ? false : true});
          case "ToggleTruncate": return _U.update(model,
            {truncated: model.truncated ? false : true});
-         case "Select": return _U.update(model,{selected: true});
-         default: return _U.update(model,{selected: false});}
+         default: return _U.update(model,
+           {selected: model.selected ? false : true});}
    });
-   var Deselect = {ctor: "Deselect"};
-   var Select = {ctor: "Select"};
+   var ToggleSelect = {ctor: "ToggleSelect"};
    var ToggleTruncate = {ctor: "ToggleTruncate"};
    var ToggleDone = {ctor: "ToggleDone"};
    var TogglePin = {ctor: "TogglePin"};
@@ -175,8 +174,7 @@ Elm.Item.make = function (_elm) {
                              ,TogglePin: TogglePin
                              ,ToggleDone: ToggleDone
                              ,ToggleTruncate: ToggleTruncate
-                             ,Select: Select
-                             ,Deselect: Deselect
+                             ,ToggleSelect: ToggleSelect
                              ,update: update
                              ,view: view};
 };

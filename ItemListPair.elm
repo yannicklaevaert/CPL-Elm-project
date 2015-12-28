@@ -16,17 +16,16 @@ type alias Model =
 init : Model
 init =
   { todoList = let initTodoList = ItemList.init
-               in ItemList.update (ItemList.SubAction 0 Item.Select) initTodoList
+               in ItemList.update (ItemList.SubAction 0 Item.ToggleSelect) initTodoList
   , doneList = ItemList.initEmpty
-  , selected = 1
+  , selected = 0
   }
 -- UPDATE
 
 type Action = TodoList ItemList.Action
             | DoneList ItemList.Action
-            | SortOldWithoutPin
-            | SortNewWithPin
-            | UpdateSelectedItem Item.Action
+            | SelectNext
+            | SelectPrevious
 
 help : ItemList.Id -> List (ItemList.Id, Item.Model) -> Item.Model
 help id list =
@@ -38,6 +37,37 @@ getSelectedItemList : Model -> Bool
 getSelectedItemList model = if model.selected > List.length (model.todoList).items
                             then False -- selected item in doneList
                             else True -- selected item in todoList
+
+getSelectedItem : Model -> (ItemList.Id, Item.Model)
+getSelectedItem model = if model.selected > List.length (model.todoList).items
+                        then ItemList.getItem (model.selected - (List.length (model.todoList).items)) (model.doneList)
+                        else ItemList.getItem model.selected (model.todoList)
+
+getPreviousItemList : Model -> Bool
+getPreviousItemList model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                            in if ((model.selected-1)%totalLength > 0) && ((model.selected-1)%totalLength <= List.length (model.todoList).items)
+                            then True -- selected item in todoList
+                            else False -- selected item in doneList
+
+getPreviousItem : Model -> (ItemList.Id, Item.Model)
+getPreviousItem model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                        in if ((model.selected-1)%totalLength > 0) && ((model.selected-1)%totalLength <= List.length (model.todoList).items)
+                           then ItemList.getItem (model.selected - 1) (model.todoList)
+                           else if (model.selected-1)%totalLength > 0
+                           then ItemList.getItem (totalLength - (List.length (model.todoList).items)) (model.doneList)
+                           else ItemList.getItem (model.selected - 1 - (List.length (model.todoList).items)) (model.doneList)
+
+getNextItemList : Model -> Bool
+getNextItemList model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                        in if (model.selected+1)%totalLength > List.length (model.todoList).items
+                           then False -- selected item in doneList
+                           else True -- selected item in todoList
+
+getNextItem : Model -> (ItemList.Id, Item.Model)
+getNextItem model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                    in if (model.selected+1)%totalLength > List.length (model.todoList).items
+                       then ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items)) (model.doneList)
+                       else ItemList.getItem (model.selected + 1) (model.todoList)
 
 update : Action -> Model -> Model
 update action model =
@@ -102,29 +132,14 @@ update action model =
             _ -> { model | doneList = ItemList.update subAction model.doneList }
         -- Only the subaction add is possible when a new reminder is added
         _ -> { model | doneList = ItemList.update subAction model.doneList }
-    SortOldWithoutPin -> { model | todoList = ItemList.update ItemList.SortOldWithoutPin model.todoList,
-                                   doneList = ItemList.update ItemList.SortOldWithoutPin model.doneList }
 
-    SortNewWithPin -> { model | todoList = ItemList.update ItemList.SortNewWithPin model.todoList,
-                                doneList = ItemList.update ItemList.SortNewWithPin model.doneList }
+    SelectNext -> { model | selected = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                                       in (model.selected + 1)%totalLength}
 
-    UpdateSelectedItem subAction ->
-      case subAction of
-        Item.ToggleDone -> if getSelectedItemList model
-                           then let (id, _) = ItemList.getItem model.selected model.todoList
-                                in { model | doneList = let updatedTodoList = ItemList.update (ItemList.SubAction id subAction) model.todoList
-                                                        in ItemList.update (ItemList.AddItem id (help id updatedTodoList.items)) model.doneList,
-                                             todoList = ItemList.update (ItemList.Remove id) model.todoList }
-                           else let (id, _) = ItemList.getItem model.selected model.doneList
-                                in { model | todoList = let updatedDoneList = ItemList.update (ItemList.SubAction id subAction) model.doneList
-                                                        in ItemList.update (ItemList.AddItem id (help id updatedDoneList.items)) model.todoList,
-                                             doneList = ItemList.update (ItemList.Remove id) model.doneList }
-
-        _ -> if getSelectedItemList model
-             then let (id, _) = ItemList.getItem model.selected model.todoList
-                  in { model | todoList = ItemList.update (ItemList.SubAction id subAction) model.todoList }
-             else let (id, _) = ItemList.getItem model.selected model.doneList
-                  in { model | doneList = ItemList.update (ItemList.SubAction id subAction) model.doneList }
+    SelectPrevious -> { model | selected = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                                           in if (model.selected - 1)%totalLength < 0
+                                              then totalLength
+                                              else (model.selected - 1)%totalLength}
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
