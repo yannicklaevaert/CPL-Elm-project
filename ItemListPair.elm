@@ -6,11 +6,19 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue)
 import ItemList
 
-type alias Model = (ItemList.Model, ItemList.Model)
+type alias Model =
+  { todoList : ItemList.Model
+  , doneList : ItemList.Model
+  , selected : Int
+  }
 
 init : Model
-init = (ItemList.init, ItemList.initEmpty)
-
+init =
+  { todoList = let initTodoList = ItemList.init
+               in ItemList.update (ItemList.SubAction 0 Item.Select) initTodoList}
+  , doneList = ItemList.initEmpty
+  , selected = 1
+  }
 -- UPDATE
 
 type Action = TodoList ItemList.Action
