@@ -99,23 +99,12 @@ view address model =
     ReminderItem reminder ->
         Html.div
         [ if model.selected
-          then A.style [("border-left-style", "solid"),
-                   ("border-left-width", "10px"),
-                   ("border-left-color", "#f5d6d6")
---                   ("border-right-style", "solid"),
---                   ("border-right-width", "10px"),
---                   ("border-right-color", "#f5d6d6")
---                   ("width", "2px")
---                   ("left", "40px")
-                  ]
+          then A.style [("border-left-style", "double"),
+                        ("border-left-width", "thick"),
+                        ("border-left-color", "rgb(170, 255, 255)")
+                       ]
           else A.style [("border-left-style", "solid"),
                         ("border-left-width", "0px")]
---        border-left 1px solid #f5d6d6,
---          border-right 1px solid #f5d6d6,
---          width 2px,
---          position absolute,
---          top 0,
---          left 40px
         ]
         [ Html.p [] [Html.text reminder.body]
         , Html.p []
@@ -143,15 +132,10 @@ view address model =
     EmailItem email ->
         Html.div
         [ if model.selected
-          then A.style [("border-left-style", "solid"),
-                   ("border-left-width", "10px"),
-                   ("border-left-color", "#f5d6d6")
---                   ("border-right-style", "solid"),
---                   ("border-right-width", "10px"),
---                   ("border-right-color", "#f5d6d6")
---                   ("width", "2px")
---                   ("left", "40px")
-                  ]
+          then A.style [("border-left-style", "double"),
+                        ("border-left-width", "thick"),
+                        ("border-left-color", "rgb(170, 255, 255)")
+                       ]
           else A.style [("border-left-style", "solid"),
                         ("border-left-width", "0px")]
         ]

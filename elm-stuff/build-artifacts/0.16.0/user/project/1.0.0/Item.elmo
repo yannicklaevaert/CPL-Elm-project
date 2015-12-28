@@ -40,16 +40,16 @@ Elm.Item.make = function (_elm) {
             return A2($Html.div,
             _U.list([model.selected ? $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                                       ,_0: "border-left-style"
-                                                                      ,_1: "solid"}
-                                                                     ,{ctor: "_Tuple2",_0: "border-left-width",_1: "10px"}
+                                                                      ,_1: "double"}
+                                                                     ,{ctor: "_Tuple2",_0: "border-left-width",_1: "thick"}
                                                                      ,{ctor: "_Tuple2"
                                                                       ,_0: "border-left-color"
-                                                                      ,_1: "#f5d6d6"}])) : $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                                                                                           ,_0: "border-left-style"
-                                                                                                                           ,_1: "solid"}
-                                                                                                                          ,{ctor: "_Tuple2"
-                                                                                                                           ,_0: "border-left-width"
-                                                                                                                           ,_1: "0px"}]))]),
+                                                                      ,_1: "rgb(170, 255, 255)"}])) : $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-style"
+                                                                                                                                      ,_1: "solid"}
+                                                                                                                                     ,{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-width"
+                                                                                                                                      ,_1: "0px"}]))]),
             _U.list([A2($Html.p,_U.list([]),_U.list([$Html.text(_p2.body)]))
                     ,A2($Html.p,
                     _U.list([]),
@@ -73,16 +73,16 @@ Elm.Item.make = function (_elm) {
             return A2($Html.div,
             _U.list([model.selected ? $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                                       ,_0: "border-left-style"
-                                                                      ,_1: "solid"}
-                                                                     ,{ctor: "_Tuple2",_0: "border-left-width",_1: "10px"}
+                                                                      ,_1: "double"}
+                                                                     ,{ctor: "_Tuple2",_0: "border-left-width",_1: "thick"}
                                                                      ,{ctor: "_Tuple2"
                                                                       ,_0: "border-left-color"
-                                                                      ,_1: "#f5d6d6"}])) : $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                                                                                           ,_0: "border-left-style"
-                                                                                                                           ,_1: "solid"}
-                                                                                                                          ,{ctor: "_Tuple2"
-                                                                                                                           ,_0: "border-left-width"
-                                                                                                                           ,_1: "0px"}]))]),
+                                                                      ,_1: "rgb(170, 255, 255)"}])) : $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-style"
+                                                                                                                                      ,_1: "solid"}
+                                                                                                                                     ,{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-width"
+                                                                                                                                      ,_1: "0px"}]))]),
             _U.list([A2($Html.p,
                     _U.list([]),
                     _U.list([$Html.text(A2($Basics._op["++"],

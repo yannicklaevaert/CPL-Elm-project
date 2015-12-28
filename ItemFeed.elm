@@ -142,12 +142,18 @@ update action model =
            else if Set.member 88 keyCodes
            then { model | todoList = if getSelectedItemList model
                                      then let (id, _) = ItemList.getItem model.selected model.todoList
-                                          in ItemList.update (ItemList.SubAction id Item.ToggleDone) model.todoList
-                                     else model.todoList,
+                                          in ItemList.update (ItemList.Remove id) model.todoList
+                                     else let (id, _) = ItemList.getItem model.selected model.doneList
+                                          in let updatedDoneList = ItemList.update (ItemList.SubAction id Item.ToggleDone) model.doneList
+                                             in ItemList.update (ItemList.Add (help id (updatedDoneList.items))) model.todoList,
                           doneList = if getSelectedItemList model
-                                     then model.doneList
+                                     then let (id, _) = ItemList.getItem model.selected model.todoList
+                                          in let updatedTodoList = ItemList.update (ItemList.SubAction id Item.ToggleDone) model.todoList
+                                             in ItemList.update (ItemList.Add (help id (updatedTodoList.items))) model.doneList
                                      else let (id, _) = ItemList.getItem (model.selected - (List.length (model.todoList).items - 1)) model.doneList
-                                          in ItemList.update (ItemList.SubAction id Item.ToggleDone) model.doneList }
+                                          in ItemList.update (ItemList.Remove id) model.doneList }
+
+
       -- "j" has keycode 74
 -- TODO KLOPT HELEMAAL NOG NIET
            else if Set.member 74 keyCodes
@@ -187,7 +193,10 @@ getSelectedItemList model = if model.selected > List.length (model.todoList).ite
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  Html.div []
+  Html.div
+      [style [("width", "40%"),
+              ("margin", "auto")]
+      ]
       [ Html.div []
         [ if List.length ((model.todoList).items) == 0
           then Html.p [] []
