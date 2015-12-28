@@ -14,6 +14,10 @@ Elm.ItemList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Static = Elm.Static.make(_elm);
    var _op = {};
+   var DoubleSubAction = F4(function (a,b,c,d) {
+      return {ctor: "DoubleSubAction",_0: a,_1: b,_2: c,_3: d};
+   });
+   var SortOldNoPin = {ctor: "SortOldNoPin"};
    var Remove = function (a) {    return {ctor: "Remove",_0: a};};
    var Add = function (a) {    return {ctor: "Add",_0: a};};
    var SubAction = F2(function (a,b) {
@@ -48,114 +52,182 @@ Elm.ItemList.make = function (_elm) {
       },
       model.items)});
    });
-   var placeIdItem = F2(function (_p6,list) {
-      var _p7 = _p6;
-      var _p11 = _p7._1;
-      var _p10 = _p7._0;
-      var _p8 = list;
-      if (_p8.ctor === "[]") {
-            return _U.list([{ctor: "_Tuple2",_0: _p10,_1: _p11}]);
+   var getItem = F2(function (n,model) {
+      var item = $List.head(A2($List.drop,n,model.items));
+      var _p6 = item;
+      if (_p6.ctor === "Just") {
+            return _p6._0;
          } else {
-            var _p9 = _p8._0._0;
-            return _U.cmp(_p10,_p9) < 0 ? A2($List._op["::"],
-            {ctor: "_Tuple2",_0: _p10,_1: _p11},
-            list) : A2($List._op["::"],
-            {ctor: "_Tuple2",_0: _p9,_1: _p8._0._1},
-            A2(placeIdItem,{ctor: "_Tuple2",_0: _p10,_1: _p11},_p8._1));
+            return {ctor: "_Tuple2",_0: 987654321,_1: $Item.dummyItem};
          }
    });
-   var sortIdItems = F2(function (unsorted,acc) {
+   var placeIdItem = F3(function (_p7,list,newToOld) {
+      var _p8 = _p7;
+      var _p16 = _p8._1;
+      var _p15 = _p8._0;
+      var _p9 = list;
+      if (_p9.ctor === "[]") {
+            return _U.list([{ctor: "_Tuple2",_0: _p15,_1: _p16}]);
+         } else {
+            var _p14 = _p9._0._1;
+            var _p13 = _p9._0._0;
+            var _p12 = _p9._1;
+            var itemType = _p16.itemType;
+            var xItemType = _p14.itemType;
+            var xDate = function () {
+               var _p10 = xItemType;
+               if (_p10.ctor === "ReminderItem") {
+                     return _p10._0.created;
+                  } else {
+                     return _p10._0.date;
+                  }
+            }();
+            var date = function () {
+               var _p11 = itemType;
+               if (_p11.ctor === "ReminderItem") {
+                     return _p11._0.created;
+                  } else {
+                     return _p11._0.date;
+                  }
+            }();
+            return newToOld ? _U.cmp(date,xDate) < 0 ? A2($List._op["::"],
+            {ctor: "_Tuple2",_0: _p15,_1: _p16},
+            list) : A2($List._op["::"],
+            {ctor: "_Tuple2",_0: _p13,_1: _p14},
+            A3(placeIdItem,
+            {ctor: "_Tuple2",_0: _p15,_1: _p16},
+            _p12,
+            newToOld)) : _U.cmp(date,xDate) > 0 ? A2($List._op["::"],
+            {ctor: "_Tuple2",_0: _p15,_1: _p16},
+            list) : A2($List._op["::"],
+            {ctor: "_Tuple2",_0: _p13,_1: _p14},
+            A3(placeIdItem,
+            {ctor: "_Tuple2",_0: _p15,_1: _p16},
+            _p12,
+            newToOld));
+         }
+   });
+   var sortIdItems = F3(function (unsorted,acc,newToOld) {
       sortIdItems: while (true) {
-         var _p12 = unsorted;
-         if (_p12.ctor === "[]") {
+         var _p17 = unsorted;
+         if (_p17.ctor === "[]") {
                return acc;
             } else {
-               var newAcc = A2(placeIdItem,
-               {ctor: "_Tuple2",_0: _p12._0._0,_1: _p12._0._1},
-               acc);
-               var _v5 = _p12._1,_v6 = newAcc;
-               unsorted = _v5;
-               acc = _v6;
+               var newAcc = A3(placeIdItem,
+               {ctor: "_Tuple2",_0: _p17._0._0,_1: _p17._0._1},
+               acc,
+               newToOld);
+               var _v8 = _p17._1,_v9 = newAcc,_v10 = newToOld;
+               unsorted = _v8;
+               acc = _v9;
+               newToOld = _v10;
                continue sortIdItems;
             }
       }
    });
+   var sortOldNoPin = function (model) {
+      return _U.update(model,
+      {items: A3(sortIdItems,model.items,_U.list([]),false)});
+   };
    var sortPinnedHelp = F3(function (unsorted,
    pinnedList,
    unpinnedList) {
       sortPinnedHelp: while (true) {
-         var _p13 = unsorted;
-         if (_p13.ctor === "[]") {
+         var _p18 = unsorted;
+         if (_p18.ctor === "[]") {
                return A2($Basics._op["++"],
-               A2(sortIdItems,pinnedList,_U.list([])),
-               A2(sortIdItems,unpinnedList,_U.list([])));
+               A3(sortIdItems,pinnedList,_U.list([]),true),
+               A3(sortIdItems,unpinnedList,_U.list([]),true));
             } else {
-               var _p16 = _p13._1;
-               var _p15 = _p13._0._1;
-               var _p14 = _p13._0._0;
-               if (_p15.pinned) {
-                     var _v8 = _p16,
-                     _v9 = A2($List._op["::"],
-                     {ctor: "_Tuple2",_0: _p14,_1: _p15},
+               var _p21 = _p18._1;
+               var _p20 = _p18._0._1;
+               var _p19 = _p18._0._0;
+               if (_p20.pinned) {
+                     var _v12 = _p21,
+                     _v13 = A2($List._op["::"],
+                     {ctor: "_Tuple2",_0: _p19,_1: _p20},
                      pinnedList),
-                     _v10 = unpinnedList;
-                     unsorted = _v8;
-                     pinnedList = _v9;
-                     unpinnedList = _v10;
+                     _v14 = unpinnedList;
+                     unsorted = _v12;
+                     pinnedList = _v13;
+                     unpinnedList = _v14;
                      continue sortPinnedHelp;
                   } else {
-                     var _v11 = _p16,
-                     _v12 = pinnedList,
-                     _v13 = A2($List._op["::"],
-                     {ctor: "_Tuple2",_0: _p14,_1: _p15},
+                     var _v15 = _p21,
+                     _v16 = pinnedList,
+                     _v17 = A2($List._op["::"],
+                     {ctor: "_Tuple2",_0: _p19,_1: _p20},
                      unpinnedList);
-                     unsorted = _v11;
-                     pinnedList = _v12;
-                     unpinnedList = _v13;
+                     unsorted = _v15;
+                     pinnedList = _v16;
+                     unpinnedList = _v17;
                      continue sortPinnedHelp;
                   }
             }
       }
    });
+   var sortNewWithPin = function (model) {
+      return _U.update(model,
+      {items: function () {
+         var unsorted = model.items;
+         return A3(sortPinnedHelp,unsorted,_U.list([]),_U.list([]));
+      }()});
+   };
    var sortPinnedUnpinned = function (unsorted) {
       return A3(sortPinnedHelp,unsorted,_U.list([]),_U.list([]));
    };
+   var addItem = F2(function (item,model) {
+      var newId = model.nextItemId;
+      return _U.update(model,
+      {items: sortPinnedUnpinned(A2($List._op["::"],
+      {ctor: "_Tuple2",_0: newId,_1: item},
+      model.items))
+      ,nextItemId: newId + 1});
+   });
+   var update = F2(function (action,model) {
+      var _p22 = action;
+      switch (_p22.ctor)
+      {case "Add": return A2(addItem,_p22._0,model);
+         case "Remove": return A2(removeItem,_p22._0,model);
+         case "SubAction": return A3(updateItem,
+           $Item.update(_p22._1),
+           _p22._0,
+           model);
+         case "SortOldNoPin": return sortOldNoPin(model);
+         default: var updatedModel = A3(updateItem,
+           $Item.update(_p22._1),
+           _p22._0,
+           model);
+           return A3(updateItem,
+           $Item.update(_p22._3),
+           _p22._2,
+           updatedModel);}
+   });
+   var addMultipleItems = F2(function (items,model) {
+      addMultipleItems: while (true) {
+         var _p23 = items;
+         if (_p23.ctor === "[]") {
+               return model;
+            } else {
+               var newModel = A2(addItem,_p23._0,model);
+               var _v20 = _p23._1,_v21 = newModel;
+               items = _v20;
+               model = _v21;
+               continue addMultipleItems;
+            }
+      }
+   });
    var sortItems = function (unsorted) {
       var sorter = function (item) {
-         var _p17 = item.itemType;
-         if (_p17.ctor === "ReminderItem") {
-               return _p17._0.created;
+         var _p24 = item.itemType;
+         if (_p24.ctor === "ReminderItem") {
+               return _p24._0.created;
             } else {
-               return _p17._0.date;
+               return _p24._0.date;
             }
       };
       return A2($List.sortBy,sorter,unsorted);
    };
-   var initialise = F2(function (model,noIdList) {
-      initialise: while (true) {
-         var temp = $List.head(noIdList);
-         var _p18 = temp;
-         if (_p18.ctor === "Nothing") {
-               return model;
-            } else {
-               var justList = $List.tail(noIdList);
-               var newModel = _U.update(model,
-               {items: A2($Basics._op["++"],
-               model.items,
-               _U.list([{ctor: "_Tuple2",_0: model.nextItemId,_1: _p18._0}]))
-               ,nextItemId: model.nextItemId + 1});
-               var _p19 = justList;
-               if (_p19.ctor === "Nothing") {
-                     return newModel;
-                  } else {
-                     var _v17 = newModel,_v18 = _p19._0;
-                     model = _v17;
-                     noIdList = _v18;
-                     continue initialise;
-                  }
-            }
-      }
-   });
    var startItems = function () {
       var emails = A2($List.map,$Item.EmailItem,$Static.emails);
       var reminders = A2($List.map,
@@ -169,40 +241,31 @@ Elm.ItemList.make = function (_elm) {
    var Model = F2(function (a,b) {
       return {items: a,nextItemId: b};
    });
-   var init = A2(initialise,A2(Model,_U.list([]),0),startItems);
-   var addItem = F2(function (item,model) {
-      var items = A2($List._op["::"],
-      item,
-      A2($List.map,$Basics.snd,model.items));
-      return A2(initialise,A2(Model,_U.list([]),0),sortItems(items));
-   });
-   var update = F2(function (action,model) {
-      var _p20 = action;
-      switch (_p20.ctor)
-      {case "Add": return A2(addItem,_p20._0,model);
-         case "Remove": return A2(removeItem,_p20._0,model);
-         default: return A3(updateItem,
-           $Item.update(_p20._1),
-           _p20._0,
-           model);}
-   });
+   var init = A2(addMultipleItems,
+   startItems,
+   A2(Model,_U.list([]),0));
    return _elm.ItemList.values = {_op: _op
                                  ,Model: Model
-                                 ,init: init
                                  ,initEmpty: initEmpty
                                  ,startItems: startItems
-                                 ,initialise: initialise
                                  ,sortItems: sortItems
+                                 ,init: init
+                                 ,addMultipleItems: addMultipleItems
                                  ,sortPinnedUnpinned: sortPinnedUnpinned
                                  ,sortPinnedHelp: sortPinnedHelp
                                  ,sortIdItems: sortIdItems
                                  ,placeIdItem: placeIdItem
+                                 ,sortNewWithPin: sortNewWithPin
+                                 ,sortOldNoPin: sortOldNoPin
+                                 ,getItem: getItem
                                  ,addItem: addItem
                                  ,removeItem: removeItem
                                  ,updateItem: updateItem
                                  ,SubAction: SubAction
                                  ,Add: Add
                                  ,Remove: Remove
+                                 ,SortOldNoPin: SortOldNoPin
+                                 ,DoubleSubAction: DoubleSubAction
                                  ,update: update
                                  ,view: view};
 };

@@ -17,8 +17,8 @@ type alias Model =
   }
 
 
-init : Model
-init = initialise (Model [] 0 ) startItems
+--init : Model
+--init = initialise (Model [] 0 ) startItems
 
 initEmpty : Model
 initEmpty =
@@ -31,7 +31,7 @@ startItems = let reminders = List.map Item.ReminderItem Static.reminders
                  emails = List.map Item.EmailItem Static.emails
              in sortItems <|List.map Item.newItem (List.append reminders emails)
 
-initialise : Model -> List Item.Model -> Model
+{-initialise : Model -> List Item.Model -> Model
 initialise model noIdList =
   let temp = (List.head noIdList)
   in case temp of
@@ -44,6 +44,7 @@ initialise model noIdList =
                      in case justList of
                        Nothing -> newModel
                        Just rest -> initialise newModel rest
+-}
 
 sortItems : List Item.Model -> List Item.Model
 sortItems unsorted = let sorter item =
@@ -52,36 +53,75 @@ sortItems unsorted = let sorter item =
                           Item.EmailItem email -> email.date
                      in List.sortBy sorter unsorted
 
+
+init : Model
+init = addMultipleItems startItems (Model [] 0)
+
+addMultipleItems : List Item.Model -> Model -> Model
+addMultipleItems items model =
+  case items of
+    [] -> model
+    item::rest -> let newModel = addItem item model
+                  in addMultipleItems rest newModel
+
 sortPinnedUnpinned : List (Id, Item.Model) -> List (Id, Item.Model)
 sortPinnedUnpinned unsorted = sortPinnedHelp unsorted [] []
 
 sortPinnedHelp : List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
 sortPinnedHelp unsorted pinnedList unpinnedList =
   case unsorted of
-    [] -> (sortIdItems pinnedList []) ++ (sortIdItems unpinnedList [])
+    [] -> (sortIdItems pinnedList [] True) ++ (sortIdItems unpinnedList [] True)
     (id, item)::rest -> if item.pinned
                         then sortPinnedHelp rest ((id, item)::pinnedList) unpinnedList
                         else sortPinnedHelp rest pinnedList ((id, item)::unpinnedList)
 
-sortIdItems : List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
-sortIdItems unsorted acc =
+sortIdItems : List (Id, Item.Model) -> List (Id, Item.Model) -> Bool -> List (Id, Item.Model)
+sortIdItems unsorted acc newToOld =
   case unsorted of
      [] -> acc
-     (id, item)::rest -> let newAcc = placeIdItem (id, item) acc
-                         in sortIdItems rest newAcc
+     (id, item)::rest -> let newAcc = placeIdItem (id, item) acc newToOld
+                         in sortIdItems rest newAcc newToOld
 
-placeIdItem : (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
-placeIdItem (id, item) list =
+placeIdItem : (Id, Item.Model) -> List (Id, Item.Model) -> Bool -> List (Id, Item.Model)
+placeIdItem (id, item) list newToOld =
   case list of
     [] -> [(id, item)]
-    (xId, xItem)::rest -> if id < xId
-                          then (id, item)::list
-                          else (xId,xItem)::(placeIdItem (id, item) rest)
+    (xId, xItem)::rest -> let xItemType = xItem.itemType
+                              itemType = item.itemType
+                              xDate =
+                            case xItemType of
+                              Item.ReminderItem xReminder -> xReminder.created
+                              Item.EmailItem xEmail -> xEmail.date
+                          in let date =
+                              case itemType of
+                                Item.ReminderItem reminder -> reminder.created
+                                Item.EmailItem email -> email.date
+                             in if newToOld
+                                then if date < xDate
+                                     then (id, item)::list
+                                     else (xId, xItem)::(placeIdItem (id, item) rest newToOld)
+                                else if date > xDate
+                                     then (id, item)::list
+                                     else (xId, xItem)::(placeIdItem (id, item) rest newToOld)
+
+sortNewWithPin : Model -> Model
+sortNewWithPin model = { model | items = let unsorted = model.items
+                                     in sortPinnedHelp unsorted [] [] }
+
+sortOldNoPin : Model -> Model
+sortOldNoPin model = { model | items = sortIdItems model.items [] False}
+
+getItem : Int -> Model -> (Id, Item.Model)
+getItem n model = let item = List.head (List.drop n model.items)
+                  in case item of
+                      Just a -> a
+                      _ -> (987654321, Item.dummyItem)
 
 addItem : Item.Model -> Model -> Model
 addItem item model =
-  let items = item :: (List.map snd model.items)
-  in initialise (Model [] 0) (sortItems items)
+  let newId = model.nextItemId
+  in { model | items = sortPinnedUnpinned((newId, item)::(model.items)),
+               nextItemId = newId + 1}
 
 removeItem : Id -> Model -> Model
 removeItem id model =
@@ -97,6 +137,8 @@ updateItem f id model =
 type Action = SubAction Id Item.Action
               | Add Item.Model
               | Remove Id
+              | SortOldNoPin
+              | DoubleSubAction Id Item.Action Id Item.Action
 
 update : Action -> Model -> Model
 update action model =
@@ -107,6 +149,11 @@ update action model =
       removeItem id model
     SubAction id action ->
       updateItem (Item.update action) id model
+    SortOldNoPin ->
+      sortOldNoPin model
+    DoubleSubAction firstId firstAction secondId secondAction ->
+      let updatedModel = updateItem (Item.update firstAction) firstId model
+      in updateItem (Item.update secondAction) secondId updatedModel
 
 
 view : Signal.Address Action -> Model -> Html

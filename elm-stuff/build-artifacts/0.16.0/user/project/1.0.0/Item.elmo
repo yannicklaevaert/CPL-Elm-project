@@ -7,6 +7,7 @@ Elm.Item.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -18,37 +19,49 @@ Elm.Item.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "Pin": return _U.update(model,{pinned: true});
-         case "Unpin": return _U.update(model,{pinned: false});
-         case "MarkAsDone": return _U.update(model,{done: true});
-         case "MarkUndone": return _U.update(model,{done: false});
-         case "Truncate": return _U.update(model,{truncated: true});
-         default: return _U.update(model,{truncated: false});}
+      {case "TogglePin": return _U.update(model,
+           {pinned: model.pinned ? false : true});
+         case "ToggleDone": return _U.update(model,
+           {done: model.done ? false : true});
+         case "ToggleTruncate": return _U.update(model,
+           {truncated: model.truncated ? false : true});
+         case "Select": return _U.update(model,{selected: true});
+         default: return _U.update(model,{selected: false});}
    });
-   var DisableTruncate = {ctor: "DisableTruncate"};
-   var Truncate = {ctor: "Truncate"};
-   var MarkUndone = {ctor: "MarkUndone"};
-   var MarkAsDone = {ctor: "MarkAsDone"};
-   var Unpin = {ctor: "Unpin"};
-   var Pin = {ctor: "Pin"};
+   var Deselect = {ctor: "Deselect"};
+   var Select = {ctor: "Select"};
+   var ToggleTruncate = {ctor: "ToggleTruncate"};
+   var ToggleDone = {ctor: "ToggleDone"};
+   var TogglePin = {ctor: "TogglePin"};
    var view = F2(function (address,model) {
       var _p1 = model.itemType;
       if (_p1.ctor === "ReminderItem") {
             var _p2 = _p1._0;
             return A2($Html.div,
-            _U.list([]),
+            _U.list([model.selected ? $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                                      ,_0: "border-left-style"
+                                                                      ,_1: "double"}
+                                                                     ,{ctor: "_Tuple2",_0: "border-left-width",_1: "thick"}
+                                                                     ,{ctor: "_Tuple2"
+                                                                      ,_0: "border-left-color"
+                                                                      ,_1: "rgb(170, 255, 255)"}])) : $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-style"
+                                                                                                                                      ,_1: "solid"}
+                                                                                                                                     ,{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-width"
+                                                                                                                                      ,_1: "0px"}]))]),
             _U.list([A2($Html.p,_U.list([]),_U.list([$Html.text(_p2.body)]))
                     ,A2($Html.p,
                     _U.list([]),
                     _U.list([_U.eq(model.done,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Undo")]))
                             ,_U.eq(model.pinned,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Pin")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Unpin")]))]))
                     ,A2($Html.p,
                     _U.list([]),
@@ -58,7 +71,18 @@ Elm.Item.make = function (_elm) {
          } else {
             var _p4 = _p1._0;
             return A2($Html.div,
-            _U.list([]),
+            _U.list([model.selected ? $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                                      ,_0: "border-left-style"
+                                                                      ,_1: "double"}
+                                                                     ,{ctor: "_Tuple2",_0: "border-left-width",_1: "thick"}
+                                                                     ,{ctor: "_Tuple2"
+                                                                      ,_0: "border-left-color"
+                                                                      ,_1: "rgb(170, 255, 255)"}])) : $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-style"
+                                                                                                                                      ,_1: "solid"}
+                                                                                                                                     ,{ctor: "_Tuple2"
+                                                                                                                                      ,_0: "border-left-width"
+                                                                                                                                      ,_1: "0px"}]))]),
             _U.list([A2($Html.p,
                     _U.list([]),
                     _U.list([$Html.text(A2($Basics._op["++"],
@@ -84,21 +108,21 @@ Elm.Item.make = function (_elm) {
                     _U.list([]),
                     _U.list([_U.cmp($String.length(_p4.body),
                             200) > -1 ? _U.eq(model.truncated,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Truncate)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleTruncate)]),
                             _U.list([$Html.text("Less")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,DisableTruncate)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleTruncate)]),
                             _U.list([$Html.text("More")])) : A2($Html.p,
                             _U.list([]),
                             _U.list([]))
                             ,_U.eq(model.done,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkAsDone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Mark as Done")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,MarkUndone)]),
+                            _U.list([A2($Html$Events.onClick,address,ToggleDone)]),
                             _U.list([$Html.text("Undo")]))
                             ,_U.eq(model.pinned,false) ? A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Pin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Pin")])) : A2($Html.button,
-                            _U.list([A2($Html$Events.onClick,address,Unpin)]),
+                            _U.list([A2($Html$Events.onClick,address,TogglePin)]),
                             _U.list([$Html.text("Unpin")]))]))
                     ,A2($Html.p,
                     _U.list([]),
@@ -107,8 +131,12 @@ Elm.Item.make = function (_elm) {
                     _p4.date))]))]));
          }
    });
-   var Model = F4(function (a,b,c,d) {
-      return {itemType: a,pinned: b,done: c,truncated: d};
+   var Model = F5(function (a,b,c,d,e) {
+      return {itemType: a
+             ,pinned: b
+             ,done: c
+             ,truncated: d
+             ,selected: e};
    });
    var EmailItem = function (a) {
       return {ctor: "EmailItem",_0: a};
@@ -122,19 +150,21 @@ Elm.Item.make = function (_elm) {
             return {itemType: ReminderItem(_p5._0)
                    ,pinned: false
                    ,done: false
-                   ,truncated: false};
+                   ,truncated: false
+                   ,selected: false};
          } else {
             return {itemType: EmailItem(_p5._0)
                    ,pinned: false
                    ,done: false
-                   ,truncated: true};
+                   ,truncated: true
+                   ,selected: false};
          }
    };
    var newReminder = F2(function (reminderBody,reminderDate) {
       return newItem(ReminderItem({body: reminderBody
                                   ,created: reminderDate}));
    });
-   var dummyItem = A2(newReminder,"dummyReminder","01-01-2000");
+   var dummyItem = A2(newReminder,"dummyReminder","2000-01-01");
    return _elm.Item.values = {_op: _op
                              ,ReminderItem: ReminderItem
                              ,EmailItem: EmailItem
@@ -142,12 +172,11 @@ Elm.Item.make = function (_elm) {
                              ,dummyItem: dummyItem
                              ,newItem: newItem
                              ,newReminder: newReminder
-                             ,Pin: Pin
-                             ,Unpin: Unpin
-                             ,MarkAsDone: MarkAsDone
-                             ,MarkUndone: MarkUndone
-                             ,Truncate: Truncate
-                             ,DisableTruncate: DisableTruncate
+                             ,TogglePin: TogglePin
+                             ,ToggleDone: ToggleDone
+                             ,ToggleTruncate: ToggleTruncate
+                             ,Select: Select
+                             ,Deselect: Deselect
                              ,update: update
                              ,view: view};
 };

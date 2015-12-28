@@ -8,6 +8,7 @@ Elm.Main.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $ItemFeed = Elm.ItemFeed.make(_elm),
+   $Keyboard = Elm.Keyboard.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -22,6 +23,14 @@ Elm.Main.make = function (_elm) {
          }
    };
    var mailbox = $Signal.mailbox($Maybe.Nothing);
+   var inputs = A2($Signal.merge,
+   mailbox.signal,
+   A2($Signal.map,
+   $Maybe.Just,
+   A3($Signal.map2,
+   $ItemFeed.KeyPress,
+   $Keyboard.alt,
+   $Keyboard.keysDown)));
    var state = function () {
       var update = F2(function (action,model) {
          var _p1 = action;
@@ -31,7 +40,7 @@ Elm.Main.make = function (_elm) {
                return model;
             }
       });
-      return A3($Signal.foldp,update,$ItemFeed.init,mailbox.signal);
+      return A3($Signal.foldp,update,$ItemFeed.init,inputs);
    }();
    var main = function () {
       var view = $ItemFeed.view(A2($Signal.forwardTo,
@@ -43,5 +52,6 @@ Elm.Main.make = function (_elm) {
                              ,mailbox: mailbox
                              ,isDefined: isDefined
                              ,state: state
+                             ,inputs: inputs
                              ,main: main};
 };
