@@ -19,10 +19,10 @@ Elm.ItemListPair.make = function (_elm) {
       return _U.cmp(A2($Basics._op["%"],
       model.selected + 1,
       totalLength),
-      $List.length(model.todoList.items)) > 0 ? A2($ItemList.getItem,
+      $List.length(model.todoList.items)) > -1 ? A2($ItemList.getItem,
       model.selected + 1 - $List.length(model.todoList.items),
       model.doneList) : A2($ItemList.getItem,
-      model.selected + 1,
+      A2($Basics._op["%"],model.selected + 1,totalLength),
       model.todoList);
    };
    var getNextItemList = function (model) {
@@ -30,7 +30,7 @@ Elm.ItemListPair.make = function (_elm) {
       return _U.cmp(A2($Basics._op["%"],
       model.selected + 1,
       totalLength),
-      $List.length(model.todoList.items)) > 0 ? false : true;
+      $List.length(model.todoList.items)) > -1 ? false : true;
    };
    var getPreviousItem = function (model) {
       var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);

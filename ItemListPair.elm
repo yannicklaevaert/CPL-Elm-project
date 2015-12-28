@@ -63,15 +63,15 @@ getPreviousItem model = let totalLength = (List.length (model.todoList).items + 
 
 getNextItemList : Model -> Bool
 getNextItemList model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
-                        in if (model.selected+1)%totalLength > List.length (model.todoList).items
+                        in if (model.selected+1)%totalLength >= List.length (model.todoList).items
                            then False -- selected item in doneList
                            else True -- selected item in todoList
 
 getNextItem : Model -> (ItemList.Id, Item.Model)
 getNextItem model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
-                    in if (model.selected+1)%totalLength > List.length (model.todoList).items
+                    in if (model.selected+1)%totalLength >= List.length (model.todoList).items
                        then ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items)) (model.doneList)
-                       else ItemList.getItem (model.selected + 1) (model.todoList)
+                       else ItemList.getItem ((model.selected + 1)%totalLength) (model.todoList)
 
 update : Action -> Model -> Model
 update action model =
