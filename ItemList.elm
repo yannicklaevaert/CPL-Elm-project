@@ -6,7 +6,6 @@ import Html exposing ( Html )
 import Html.Events as E
 import Static
 import Item
-
 import List
 
 type alias Id = Int

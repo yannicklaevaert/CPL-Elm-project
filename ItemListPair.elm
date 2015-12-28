@@ -2,8 +2,6 @@ module ItemListPair where
 
 import Signal
 import Html exposing ( Html )
-import Html.Attributes exposing (..)
-import Html.Events exposing (on, targetValue)
 import ItemList
 import Item
 
@@ -34,28 +32,34 @@ help id list =
     [] -> Item.dummyItem
 
 getSelectedItemList : Model -> Bool
-getSelectedItemList model = if model.selected > List.length (model.todoList).items
+getSelectedItemList model = if model.selected >= List.length (model.todoList).items
                             then False -- selected item in doneList
                             else True -- selected item in todoList
 
 getSelectedItem : Model -> (ItemList.Id, Item.Model)
-getSelectedItem model = if model.selected > List.length (model.todoList).items
+getSelectedItem model = if model.selected >= List.length (model.todoList).items
                         then ItemList.getItem (model.selected - (List.length (model.todoList).items)) (model.doneList)
                         else ItemList.getItem model.selected (model.todoList)
 
 getPreviousItemList : Model -> Bool
 getPreviousItemList model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
-                            in if ((model.selected-1)%totalLength > 0) && ((model.selected-1)%totalLength <= List.length (model.todoList).items)
-                            then True -- selected item in todoList
-                            else False -- selected item in doneList
+                            in if (model.selected%totalLength == 0)
+                               then if (List.length (model.doneList).items == 0)
+                                    then True -- selected item in todoList
+                                    else False -- selected item in doneList
+                               else if ((model.selected-1)%totalLength) < List.length (model.todoList).items
+                                    then True -- selected item in todoList
+                                    else False -- selected item in doneList
 
 getPreviousItem : Model -> (ItemList.Id, Item.Model)
 getPreviousItem model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
-                        in if ((model.selected-1)%totalLength > 0) && ((model.selected-1)%totalLength <= List.length (model.todoList).items)
-                           then ItemList.getItem (model.selected - 1) (model.todoList)
-                           else if (model.selected-1)%totalLength > 0
-                           then ItemList.getItem (totalLength - (List.length (model.todoList).items)) (model.doneList)
-                           else ItemList.getItem (model.selected - 1 - (List.length (model.todoList).items)) (model.doneList)
+                        in if (model.selected%totalLength == 0)
+                           then if (List.length (model.doneList).items == 0)
+                                then ItemList.getItem (totalLength - 1) (model.todoList)
+                                else ItemList.getItem (totalLength - 1) (model.doneList)
+                           else if ((model.selected-1)%totalLength) < List.length (model.todoList).items
+                                then ItemList.getItem (model.selected - 1) (model.todoList)
+                                else ItemList.getItem (model.selected - 1 - (List.length (model.todoList).items)) (model.doneList)
 
 getNextItemList : Model -> Bool
 getNextItemList model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
@@ -137,8 +141,8 @@ update action model =
                                        in (model.selected + 1)%totalLength}
 
     SelectPrevious -> { model | selected = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
-                                           in if (model.selected - 1)%totalLength < 0
-                                              then totalLength
+                                           in if model.selected%totalLength == 0
+                                              then (totalLength - 1)
                                               else (model.selected - 1)%totalLength}
 -- VIEW
 

@@ -12433,36 +12433,33 @@ Elm.ItemListPair.make = function (_elm) {
    };
    var getPreviousItem = function (model) {
       var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
-      return _U.cmp(A2($Basics._op["%"],
+      return _U.eq(A2($Basics._op["%"],model.selected,totalLength),
+      0) ? _U.eq($List.length(model.doneList.items),
+      0) ? A2($ItemList.getItem,
+      totalLength - 1,
+      model.todoList) : A2($ItemList.getItem,
+      totalLength - 1,
+      model.doneList) : _U.cmp(A2($Basics._op["%"],
       model.selected - 1,
       totalLength),
-      0) > 0 && _U.cmp(A2($Basics._op["%"],
+      $List.length(model.todoList.items)) < 0 ? A2($ItemList.getItem,
       model.selected - 1,
-      totalLength),
-      $List.length(model.todoList.items)) < 1 ? A2($ItemList.getItem,
-      model.selected - 1,
-      model.todoList) : _U.cmp(A2($Basics._op["%"],
-      model.selected - 1,
-      totalLength),
-      0) > 0 ? A2($ItemList.getItem,
-      totalLength - $List.length(model.todoList.items),
-      model.doneList) : A2($ItemList.getItem,
+      model.todoList) : A2($ItemList.getItem,
       model.selected - 1 - $List.length(model.todoList.items),
       model.doneList);
    };
    var getPreviousItemList = function (model) {
       var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
-      return _U.cmp(A2($Basics._op["%"],
+      return _U.eq(A2($Basics._op["%"],model.selected,totalLength),
+      0) ? _U.eq($List.length(model.doneList.items),
+      0) ? true : false : _U.cmp(A2($Basics._op["%"],
       model.selected - 1,
       totalLength),
-      0) > 0 && _U.cmp(A2($Basics._op["%"],
-      model.selected - 1,
-      totalLength),
-      $List.length(model.todoList.items)) < 1 ? true : false;
+      $List.length(model.todoList.items)) < 0 ? true : false;
    };
    var getSelectedItem = function (model) {
       return _U.cmp(model.selected,
-      $List.length(model.todoList.items)) > 0 ? A2($ItemList.getItem,
+      $List.length(model.todoList.items)) > -1 ? A2($ItemList.getItem,
       model.selected - $List.length(model.todoList.items),
       model.doneList) : A2($ItemList.getItem,
       model.selected,
@@ -12470,7 +12467,7 @@ Elm.ItemListPair.make = function (_elm) {
    };
    var getSelectedItemList = function (model) {
       return _U.cmp(model.selected,
-      $List.length(model.todoList.items)) > 0 ? false : true;
+      $List.length(model.todoList.items)) > -1 ? false : true;
    };
    var help = F2(function (id,list) {
       help: while (true) {
@@ -12566,10 +12563,8 @@ Elm.ItemListPair.make = function (_elm) {
          default: return _U.update(model,
            {selected: function () {
               var totalLength = $List.length(model.todoList.items) + $List.length(model.doneList.items);
-              return _U.cmp(A2($Basics._op["%"],
-              model.selected - 1,
-              totalLength),
-              0) < 0 ? totalLength : A2($Basics._op["%"],
+              return _U.eq(A2($Basics._op["%"],model.selected,totalLength),
+              0) ? totalLength - 1 : A2($Basics._op["%"],
               model.selected - 1,
               totalLength);
            }()});}

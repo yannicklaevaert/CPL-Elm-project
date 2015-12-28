@@ -72,13 +72,14 @@ update action model =
                                                 then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction id Item.ToggleTruncate)) model.todoDoneListPair
                                                 else ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction id Item.ToggleTruncate)) model.todoDoneListPair }
       -- "p" has keycode 80
+-- TODO KLOPT HELEMAAL NOG NIET -> selecteditem moet nog wijzigen
            else if Set.member 80 keyCodes
            then { model | todoDoneListPair = let (id, _) = getSelectedItem model
                                              in if getSelectedItemList model
                                                 then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction id Item.TogglePin)) model.todoDoneListPair
                                                 else ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction id Item.TogglePin)) model.todoDoneListPair }
       -- "x" has keycode 88
--- TODO KLOPT HELEMAAL NOG NIET -> Beide lijsten moeten geupdate worden
+-- TODO KLOPT HELEMAAL NOG NIET -> selecteditem moet nog wijzigen
            else if Set.member 88 keyCodes
            then { model | todoDoneListPair = let (id, _) = getSelectedItem model
                                              in if getSelectedItemList model
