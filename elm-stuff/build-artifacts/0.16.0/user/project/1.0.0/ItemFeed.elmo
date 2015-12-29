@@ -96,23 +96,23 @@ Elm.ItemFeed.make = function (_elm) {
               model.reminderDate)))))]),
               _U.list([$Html.text("Add")]))]));
    });
-   var getNextItem = function (model) {
-      return $ItemListPair.getNextItem(model.todoDoneListPair);
+   var getNextItem = function (itemListPair) {
+      return $ItemListPair.getNextItem(itemListPair);
    };
-   var getNextItemList = function (model) {
-      return $ItemListPair.getNextItemList(model.todoDoneListPair);
+   var getNextItemList = function (itemListPair) {
+      return $ItemListPair.getNextItemList(itemListPair);
    };
-   var getPreviousItem = function (model) {
-      return $ItemListPair.getPreviousItem(model.todoDoneListPair);
+   var getPreviousItem = function (itemListPair) {
+      return $ItemListPair.getPreviousItem(itemListPair);
    };
-   var getPreviousItemList = function (model) {
-      return $ItemListPair.getPreviousItemList(model.todoDoneListPair);
+   var getPreviousItemList = function (itemListPair) {
+      return $ItemListPair.getPreviousItemList(itemListPair);
    };
-   var getSelectedItem = function (model) {
-      return $ItemListPair.getSelectedItem(model.todoDoneListPair);
+   var getSelectedItem = function (itemListPair) {
+      return $ItemListPair.getSelectedItem(itemListPair);
    };
-   var getSelectedItemList = function (model) {
-      return $ItemListPair.getSelectedItemList(model.todoDoneListPair);
+   var getSelectedItemList = function (itemListPair) {
+      return $ItemListPair.getSelectedItemList(itemListPair);
    };
    var update = F2(function (action,model) {
       var _p1 = action;
@@ -124,8 +124,8 @@ Elm.ItemFeed.make = function (_elm) {
          case "SaveContent": return _U.update(model,
            {reminderField: _p1._0});
          case "SaveDate": return _U.update(model,{reminderDate: _p1._0});
-         default: var _p9 = _p1._1;
-           return _p1._0 ? A2($Set.member,83,_p9) ? _U.update(model,
+         default: var _p11 = _p1._1;
+           return _p1._0 ? A2($Set.member,83,_p11) ? _U.update(model,
            {todoDoneListPair: function () {
               var newPair = A2($ItemListPair.update,
               $ItemListPair.TodoList($ItemList.SortOldWithoutPin),
@@ -133,11 +133,11 @@ Elm.ItemFeed.make = function (_elm) {
               return A2($ItemListPair.update,
               $ItemListPair.DoneList($ItemList.SortOldWithoutPin),
               newPair);
-           }()}) : A2($Set.member,79,_p9) ? _U.update(model,
+           }()}) : A2($Set.member,79,_p11) ? _U.update(model,
            {todoDoneListPair: function () {
-              var _p2 = getSelectedItem(model);
+              var _p2 = getSelectedItem(model.todoDoneListPair);
               var id = _p2._0;
-              return getSelectedItemList(model) ? A2($ItemListPair.update,
+              return getSelectedItemList(model.todoDoneListPair) ? A2($ItemListPair.update,
               $ItemListPair.TodoList(A2($ItemList.SubAction,
               id,
               $Item.ToggleTruncate)),
@@ -146,24 +146,51 @@ Elm.ItemFeed.make = function (_elm) {
               id,
               $Item.ToggleTruncate)),
               model.todoDoneListPair);
-           }()}) : A2($Set.member,80,_p9) ? _U.update(model,
+           }()}) : A2($Set.member,80,_p11) ? _U.update(model,
            {todoDoneListPair: function () {
-              var _p3 = getSelectedItem(model);
-              var id = _p3._0;
-              return getSelectedItemList(model) ? A2($ItemListPair.update,
+              var _p3 = getSelectedItem(model.todoDoneListPair);
+              var currentId = _p3._0;
+              var updatedPair = getSelectedItemList(model.todoDoneListPair) ? A2($ItemListPair.update,
               $ItemListPair.TodoList(A2($ItemList.SubAction,
-              id,
+              currentId,
               $Item.TogglePin)),
               model.todoDoneListPair) : A2($ItemListPair.update,
               $ItemListPair.DoneList(A2($ItemList.SubAction,
-              id,
+              currentId,
               $Item.TogglePin)),
               model.todoDoneListPair);
-           }()}) : A2($Set.member,88,_p9) ? _U.update(model,
+              if (getSelectedItemList(model.todoDoneListPair)) {
+                    var _p4 = getSelectedItem(updatedPair);
+                    var newSelectedId = _p4._0;
+                    var updatedNewPair = A2($ItemListPair.update,
+                    $ItemListPair.TodoList(A2($ItemList.SubAction,
+                    currentId,
+                    $Item.ToggleSelect)),
+                    updatedPair);
+                    return A2($ItemListPair.update,
+                    $ItemListPair.TodoList(A2($ItemList.SubAction,
+                    newSelectedId,
+                    $Item.ToggleSelect)),
+                    updatedNewPair);
+                 } else {
+                    var _p5 = getSelectedItem(updatedPair);
+                    var newSelectedId = _p5._0;
+                    var updatedNewPair = A2($ItemListPair.update,
+                    $ItemListPair.DoneList(A2($ItemList.SubAction,
+                    currentId,
+                    $Item.ToggleSelect)),
+                    updatedPair);
+                    return A2($ItemListPair.update,
+                    $ItemListPair.DoneList(A2($ItemList.SubAction,
+                    newSelectedId,
+                    $Item.ToggleSelect)),
+                    updatedNewPair);
+                 }
+           }()}) : A2($Set.member,88,_p11) ? _U.update(model,
            {todoDoneListPair: function () {
-              var _p4 = getSelectedItem(model);
-              var id = _p4._0;
-              return getSelectedItemList(model) ? A2($ItemListPair.update,
+              var _p6 = getNextItem(model.todoDoneListPair);
+              var id = _p6._0;
+              return getSelectedItemList(model.todoDoneListPair) ? A2($ItemListPair.update,
               $ItemListPair.TodoList(A2($ItemList.SubAction,
               id,
               $Item.ToggleDone)),
@@ -172,14 +199,15 @@ Elm.ItemFeed.make = function (_elm) {
               id,
               $Item.ToggleDone)),
               model.todoDoneListPair);
-           }()}) : A2($Set.member,74,_p9) ? _U.update(model,
+           }()}) : A2($Set.member,74,_p11) ? _U.update(model,
            {todoDoneListPair: function () {
-              var _p5 = getSelectedItem(model);
-              var currentId = _p5._0;
-              var _p6 = getNextItem(model);
-              var nextId = _p6._0;
+              var _p7 = getSelectedItem(model.todoDoneListPair);
+              var currentId = _p7._0;
+              var _p8 = getNextItem(model.todoDoneListPair);
+              var nextId = _p8._0;
               var updatedPair = function () {
-                 if (getNextItemList(model) && getSelectedItemList(model)) {
+                 if (getNextItemList(model.todoDoneListPair) && getSelectedItemList(model.todoDoneListPair))
+                 {
                        var newPair = A2($ItemListPair.update,
                        $ItemListPair.TodoList(A2($ItemList.SubAction,
                        nextId,
@@ -191,7 +219,7 @@ Elm.ItemFeed.make = function (_elm) {
                        $Item.ToggleSelect)),
                        newPair);
                     }
-                 else if (getNextItemList(model) && $Basics.not(getSelectedItemList(model)))
+                 else if (getNextItemList(model.todoDoneListPair) && $Basics.not(getSelectedItemList(model.todoDoneListPair)))
                     {
                           var newPair = A2($ItemListPair.update,
                           $ItemListPair.TodoList(A2($ItemList.SubAction,
@@ -204,7 +232,7 @@ Elm.ItemFeed.make = function (_elm) {
                           $Item.ToggleSelect)),
                           newPair);
                        }
-                    else if ($Basics.not(getNextItemList(model)) && getSelectedItemList(model))
+                    else if ($Basics.not(getNextItemList(model.todoDoneListPair)) && getSelectedItemList(model.todoDoneListPair))
                        {
                              var newPair = A2($ItemListPair.update,
                              $ItemListPair.DoneList(A2($ItemList.SubAction,
@@ -232,14 +260,14 @@ Elm.ItemFeed.make = function (_elm) {
               return A2($ItemListPair.update,
               $ItemListPair.SelectNext,
               updatedPair);
-           }()}) : A2($Set.member,75,_p9) ? _U.update(model,
+           }()}) : A2($Set.member,75,_p11) ? _U.update(model,
            {todoDoneListPair: function () {
-              var _p7 = getSelectedItem(model);
-              var currentId = _p7._0;
-              var _p8 = getPreviousItem(model);
-              var previousId = _p8._0;
+              var _p9 = getSelectedItem(model.todoDoneListPair);
+              var currentId = _p9._0;
+              var _p10 = getPreviousItem(model.todoDoneListPair);
+              var previousId = _p10._0;
               var updatedPair = function () {
-                 if (getPreviousItemList(model) && getSelectedItemList(model))
+                 if (getPreviousItemList(model.todoDoneListPair) && getSelectedItemList(model.todoDoneListPair))
                  {
                        var newPair = A2($ItemListPair.update,
                        $ItemListPair.TodoList(A2($ItemList.SubAction,
@@ -252,7 +280,7 @@ Elm.ItemFeed.make = function (_elm) {
                        $Item.ToggleSelect)),
                        newPair);
                     }
-                 else if (getPreviousItemList(model) && $Basics.not(getSelectedItemList(model)))
+                 else if (getPreviousItemList(model.todoDoneListPair) && $Basics.not(getSelectedItemList(model.todoDoneListPair)))
                     {
                           var newPair = A2($ItemListPair.update,
                           $ItemListPair.TodoList(A2($ItemList.SubAction,
@@ -265,7 +293,7 @@ Elm.ItemFeed.make = function (_elm) {
                           $Item.ToggleSelect)),
                           newPair);
                        }
-                    else if ($Basics.not(getPreviousItemList(model)) && getSelectedItemList(model))
+                    else if ($Basics.not(getPreviousItemList(model.todoDoneListPair)) && getSelectedItemList(model.todoDoneListPair))
                        {
                              var newPair = A2($ItemListPair.update,
                              $ItemListPair.DoneList(A2($ItemList.SubAction,

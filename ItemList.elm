@@ -15,43 +15,11 @@ type alias Model =
   , nextItemId : Id
   }
 
-
---init : Model
---init = initialise (Model [] 0 ) startItems
-
 initEmpty : Model
 initEmpty =
   { items = []
   , nextItemId = 0
   }
-
-startItems : List Item.Model
-startItems = let reminders = List.map Item.ReminderItem Static.reminders
-                 emails = List.map Item.EmailItem Static.emails
-             in sortItems <|List.map Item.newItem (List.append reminders emails)
-
-{-initialise : Model -> List Item.Model -> Model
-initialise model noIdList =
-  let temp = (List.head noIdList)
-  in case temp of
-    Nothing -> model
-    Just nextItem -> let newModel = { model | items = model.items ++ [(model.nextItemId, nextItem)],
-                                              nextItemId = model.nextItemId + 1
-                                    }
-      --Model (List.append model.items [(model.nextItemId, a)]) (model.nextItemId + 1)
-                         justList = (List.tail noIdList)
-                     in case justList of
-                       Nothing -> newModel
-                       Just rest -> initialise newModel rest
--}
-
-sortItems : List Item.Model -> List Item.Model
-sortItems unsorted = let sorter item =
-                        case item.itemType of
-                          Item.ReminderItem reminder -> reminder.created
-                          Item.EmailItem email -> email.date
-                     in List.sortBy sorter unsorted
-
 
 init : Model
 init = addMultipleItems startItems (Model [] 0)
@@ -63,8 +31,24 @@ addMultipleItems items model =
     item::rest -> let newModel = addNewItem item model
                   in addMultipleItems rest newModel
 
---sortPinnedUnpinned : List (Id, Item.Model) -> List (Id, Item.Model)
---sortPinnedUnpinned unsorted = sortPinnedHelp unsorted [] []
+startItems : List Item.Model
+startItems = let reminders = List.map Item.ReminderItem Static.reminders
+                 emails = List.map Item.EmailItem Static.emails
+             in sortItems <|List.map Item.newItem (List.append reminders emails)
+
+sortItems : List Item.Model -> List Item.Model
+sortItems unsorted = let sorter item =
+                        case item.itemType of
+                          Item.ReminderItem reminder -> reminder.created
+                          Item.EmailItem email -> email.date
+                     in List.sortBy sorter unsorted
+
+sortNewWithPin : Model -> Model
+sortNewWithPin model = { model | items = let unsorted = model.items
+                                     in sortPinnedHelp unsorted [] [] }
+
+sortOldWithoutPin : Model -> Model
+sortOldWithoutPin model = { model | items = sortIdItems model.items [] False}
 
 sortPinnedHelp : List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model) -> List (Id, Item.Model)
 sortPinnedHelp unsorted pinnedList unpinnedList =
@@ -102,13 +86,6 @@ placeIdItem (id, item) list newToOld =
                                 else if date > xDate
                                      then (id, item)::list
                                      else (xId, xItem)::(placeIdItem (id, item) rest newToOld)
-
-sortNewWithPin : Model -> Model
-sortNewWithPin model = { model | items = let unsorted = model.items
-                                     in sortPinnedHelp unsorted [] [] }
-
-sortOldWithoutPin : Model -> Model
-sortOldWithoutPin model = { model | items = sortIdItems model.items [] False}
 
 getItem : Int -> Model -> (Id, Item.Model)
 getItem n model = let item = List.head (List.drop n model.items)

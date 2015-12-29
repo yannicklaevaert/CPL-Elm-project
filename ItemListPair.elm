@@ -18,17 +18,11 @@ init =
   , doneList = ItemList.initEmpty
   , selected = 0
   }
--- UPDATE
 
-type Action = TodoList ItemList.Action
-            | DoneList ItemList.Action
-            | SelectNext
-            | SelectPrevious
-
-help : ItemList.Id -> List (ItemList.Id, Item.Model) -> Item.Model
-help id list =
+findItemWithId : ItemList.Id -> List (ItemList.Id, Item.Model) -> Item.Model
+findItemWithId id list =
   case list of
-    (x, y)::rest -> if x==id then y else help id rest
+    (x, y)::rest -> if x==id then y else findItemWithId id rest
     [] -> Item.dummyItem
 
 getSelectedItemList : Model -> Bool
@@ -56,7 +50,7 @@ getPreviousItem model = let totalLength = (List.length (model.todoList).items + 
                         in if (model.selected%totalLength == 0)
                            then if (List.length (model.doneList).items == 0)
                                 then ItemList.getItem (totalLength - 1) (model.todoList)
-                                else ItemList.getItem (totalLength - 1) (model.doneList)
+                                else ItemList.getItem (totalLength - 1 - (List.length (model.todoList).items)) (model.doneList)
                            else if ((model.selected-1)%totalLength) < List.length (model.todoList).items
                                 then ItemList.getItem (model.selected - 1) (model.todoList)
                                 else ItemList.getItem (model.selected - 1 - (List.length (model.todoList).items)) (model.doneList)
@@ -72,6 +66,13 @@ getNextItem model = let totalLength = (List.length (model.todoList).items + List
                     in if (model.selected+1)%totalLength >= List.length (model.todoList).items
                        then ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items)) (model.doneList)
                        else ItemList.getItem ((model.selected + 1)%totalLength) (model.todoList)
+
+-- UPDATE
+
+type Action = TodoList ItemList.Action
+            | DoneList ItemList.Action
+            | SelectNext
+            | SelectPrevious
 
 update : Action -> Model -> Model
 update action model =
@@ -99,7 +100,7 @@ update action model =
             Item.MarkUndone -> model
 -}
             Item.ToggleDone -> { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
-                                                    in ItemList.update (ItemList.AddItem id (help id (updatedTodoList.items))) model.doneList,
+                                                    in ItemList.update (ItemList.AddItem id (findItemWithId id (updatedTodoList.items))) model.doneList,
                                          todoList = ItemList.update (ItemList.Remove id) model.todoList }
             -- Truncate or disabletruncate just updates the item in this list
             _ -> { model | todoList = ItemList.update subAction model.todoList }
@@ -129,7 +130,7 @@ update action model =
                                          doneList = ItemList.update (ItemList.Remove id) model.doneList }
 -}
             Item.ToggleDone -> { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
-                                                    in ItemList.update (ItemList.AddItem id (help id updatedDoneList.items)) model.todoList,
+                                                    in ItemList.update (ItemList.AddItem id (findItemWithId id updatedDoneList.items)) model.todoList,
                                          doneList = ItemList.update (ItemList.Remove id) model.doneList }
 
             -- Truncate or disabletruncate just updates the item in this list

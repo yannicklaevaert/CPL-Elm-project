@@ -77,11 +77,7 @@ update action model =
                            else True }
 
 
-
-
 -- VIEW
-
-
 
 view : Signal.Address Action -> Model -> Html
 view address model =
@@ -100,11 +96,9 @@ view address model =
         , Html.p []
           [ if model.done == False
             then Html.button
---                [ E.onClick address MarkAsDone ]
                 [ E.onClick address ToggleDone ]
                 [ Html.text "Mark as Done" ]
             else Html.button
---                [ E.onClick address MarkUndone ]
                 [ E.onClick address ToggleDone ]
                 [ Html.text "Undo" ]
           , if model.pinned == False
@@ -149,11 +143,9 @@ view address model =
             else Html.p [] []
           , if model.done == False
             then Html.button
---                  [ E.onClick address MarkAsDone ]
                   [ E.onClick address ToggleDone ]
                   [ Html.text "Mark as Done" ]
             else Html.button
---                  [ E.onClick address MarkUndone ]
                   [ E.onClick address ToggleDone ]
                   [ Html.text "Undo" ]
           , if model.pinned == False

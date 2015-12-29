@@ -25,23 +25,23 @@ init =
   , reminderDate = "2015-01-01"
   }
 
-getSelectedItemList : Model -> Bool
-getSelectedItemList model = ItemListPair.getSelectedItemList model.todoDoneListPair
+getSelectedItemList : ItemListPair.Model -> Bool
+getSelectedItemList itemListPair = ItemListPair.getSelectedItemList itemListPair
 
-getSelectedItem : Model -> (ItemList.Id, Item.Model)
-getSelectedItem model = ItemListPair.getSelectedItem model.todoDoneListPair
+getSelectedItem : ItemListPair.Model -> (ItemList.Id, Item.Model)
+getSelectedItem itemListPair = ItemListPair.getSelectedItem itemListPair
 
-getPreviousItemList : Model -> Bool
-getPreviousItemList model = ItemListPair.getPreviousItemList model.todoDoneListPair
+getPreviousItemList : ItemListPair.Model -> Bool
+getPreviousItemList itemListPair = ItemListPair.getPreviousItemList itemListPair
 
-getPreviousItem : Model -> (ItemList.Id, Item.Model)
-getPreviousItem model = ItemListPair.getPreviousItem model.todoDoneListPair
+getPreviousItem : ItemListPair.Model -> (ItemList.Id, Item.Model)
+getPreviousItem itemListPair = ItemListPair.getPreviousItem itemListPair
 
-getNextItemList : Model -> Bool
-getNextItemList model = ItemListPair.getNextItemList model.todoDoneListPair
+getNextItemList : ItemListPair.Model -> Bool
+getNextItemList itemListPair = ItemListPair.getNextItemList itemListPair
 
-getNextItem : Model -> (ItemList.Id, Item.Model)
-getNextItem model = ItemListPair.getNextItem model.todoDoneListPair
+getNextItem : ItemListPair.Model -> (ItemList.Id, Item.Model)
+getNextItem itemListPair = ItemListPair.getNextItem itemListPair
 
 -- UPDATE
 
@@ -67,22 +67,31 @@ update action model =
                                              in ItemListPair.update (ItemListPair.DoneList ItemList.SortOldWithoutPin) newPair }
       -- "o" has keycode 79
            else if Set.member 79 keyCodes
-           then { model | todoDoneListPair = let (id, _) = getSelectedItem model
-                                             in if getSelectedItemList model
+           then { model | todoDoneListPair = let (id, _) = getSelectedItem model.todoDoneListPair
+                                             in if getSelectedItemList model.todoDoneListPair
                                                 then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction id Item.ToggleTruncate)) model.todoDoneListPair
                                                 else ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction id Item.ToggleTruncate)) model.todoDoneListPair }
       -- "p" has keycode 80
 -- TODO KLOPT HELEMAAL NOG NIET -> selecteditem moet nog wijzigen
            else if Set.member 80 keyCodes
-           then { model | todoDoneListPair = let (id, _) = getSelectedItem model
-                                             in if getSelectedItemList model
-                                                then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction id Item.TogglePin)) model.todoDoneListPair
-                                                else ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction id Item.TogglePin)) model.todoDoneListPair }
+           then { model | todoDoneListPair = let (currentId, _) = getSelectedItem model.todoDoneListPair
+                                             in let updatedPair =
+                                                  if getSelectedItemList model.todoDoneListPair
+                                                  then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.TogglePin)) model.todoDoneListPair
+                                                  else ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.TogglePin)) model.todoDoneListPair
+                                                in if getSelectedItemList model.todoDoneListPair
+                                                   then let updatedNewPair = ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
+                                                            (newSelectedId, _) = getSelectedItem updatedPair
+                                                        in ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+                                                   else let updatedNewPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
+                                                            (newSelectedId, _) = getSelectedItem updatedPair
+                                                        in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair }
       -- "x" has keycode 88
 -- TODO KLOPT HELEMAAL NOG NIET -> selecteditem moet nog wijzigen
            else if Set.member 88 keyCodes
-           then { model | todoDoneListPair = let (id, _) = getSelectedItem model
-                                             in if getSelectedItemList model
+           then { model | todoDoneListPair = let (id, _) = getNextItem model.todoDoneListPair
+
+                                             in if getSelectedItemList model.todoDoneListPair
                                                 then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction id Item.ToggleDone)) model.todoDoneListPair
                                                 else ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction id Item.ToggleDone)) model.todoDoneListPair }
 
@@ -90,16 +99,16 @@ update action model =
       -- "j" has keycode 74
 -- TODO KLOPT HELEMAAL NOG NIET
            else if Set.member 74 keyCodes
-           then { model | todoDoneListPair = let (nextId, _) = getNextItem model
-                                                 (currentId, _) = getSelectedItem model
+           then { model | todoDoneListPair = let (nextId, _) = getNextItem model.todoDoneListPair
+                                                 (currentId, _) = getSelectedItem model.todoDoneListPair
                                              in let updatedPair =
-                                                  if getNextItemList model && getSelectedItemList model
+                                                  if getNextItemList model.todoDoneListPair && getSelectedItemList model.todoDoneListPair
                                                   then let newPair = ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction nextId Item.ToggleSelect)) model.todoDoneListPair
                                                        in ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
-                                                  else if getNextItemList model && not (getSelectedItemList model)
+                                                  else if getNextItemList model.todoDoneListPair && not (getSelectedItemList model.todoDoneListPair)
                                                   then let newPair = ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction nextId Item.ToggleSelect)) model.todoDoneListPair
                                                        in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
-                                                  else if not (getNextItemList model) && getSelectedItemList model
+                                                  else if not (getNextItemList model.todoDoneListPair) && getSelectedItemList model.todoDoneListPair
                                                   then let newPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction nextId Item.ToggleSelect)) model.todoDoneListPair
                                                        in ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
                                                   else let newPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction nextId Item.ToggleSelect)) model.todoDoneListPair
@@ -108,16 +117,16 @@ update action model =
         -- "k" has keycode 75
 -- TODO KLOPT HELEMAAL NOG NIET
           else if Set.member 75 keyCodes
-          then { model | todoDoneListPair = let (previousId, _) = getPreviousItem model
-                                                (currentId, _) = getSelectedItem model
+          then { model | todoDoneListPair = let (previousId, _) = getPreviousItem model.todoDoneListPair
+                                                (currentId, _) = getSelectedItem model.todoDoneListPair
                                             in let updatedPair =
-                                                 if getPreviousItemList model && getSelectedItemList model
+                                                 if getPreviousItemList model.todoDoneListPair && getSelectedItemList model.todoDoneListPair
                                                  then let newPair = ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction previousId Item.ToggleSelect)) model.todoDoneListPair
                                                       in ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
-                                                 else if getPreviousItemList model && not (getSelectedItemList model)
+                                                 else if getPreviousItemList model.todoDoneListPair && not (getSelectedItemList model.todoDoneListPair)
                                                  then let newPair = ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction previousId Item.ToggleSelect)) model.todoDoneListPair
                                                       in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
-                                                 else if not (getPreviousItemList model) && getSelectedItemList model
+                                                 else if not (getPreviousItemList model.todoDoneListPair) && getSelectedItemList model.todoDoneListPair
                                                  then let newPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction previousId Item.ToggleSelect)) model.todoDoneListPair
                                                       in ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
                                                  else let newPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction previousId Item.ToggleSelect)) model.todoDoneListPair
@@ -147,17 +156,14 @@ view address model =
             , on "input" targetValue (\str -> Signal.message address (SaveContent str))
             , type' "text"
             , value model.reminderField
---            , onEnter address (TodoList (ItemList.Add (Item.newReminder model.reminderField model.reminderDate)))
             , onEnter address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))
           ] []
       , Html.input
           [ type' "date"
             , on "input" targetValue (\date -> Signal.message address (SaveDate date))
             , value model.reminderDate
---            , onEnter address (TodoList (ItemList.Add (Item.newReminder model.reminderField model.reminderDate)))
             , onEnter address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))
           ] []
---      , Html.button [ onClick address (TodoList (ItemList.Add (Item.newReminder model.reminderField model.reminderDate)))] [ Html.text "Add" ]
       , Html.button [ onClick address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))] [ Html.text "Add" ]
       ]
 
