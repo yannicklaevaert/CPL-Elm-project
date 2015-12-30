@@ -14,14 +14,15 @@ import Keyboard
 
 
 -- * Add a hotkey to toggle the visibility of 'done' items.
--- Status: Completed / Attempted / Unattempted
--- Summary:
+-- Status: Completed
+-- Summary: The hotkey is alt + v. If there are no items in the done list, the list is automatically toggled invisible.
+--          It doesn't matter if there are items in the list or not, the visibility can be changed with the hotkey.
 
 
 -- * Hide the 'add reminder' functionality and add a hotkey to toggle its
 -- * visibility.
--- Status: Completed / Attempted / Unattempted
--- Summary:
+-- Status: Completed
+-- Summary: The hotkey is alt + r. The add reminder functionality is toggled invisible as default.
 
 
 -- * Put the current date as the default in the date picker when adding

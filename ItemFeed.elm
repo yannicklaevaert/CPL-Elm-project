@@ -16,6 +16,7 @@ type alias Model =
   { todoDoneListPair : ItemListPair.Model
   , reminderField : String
   , reminderDate : String
+  , addReminderVisibility : Bool
   }
 
 init : Model
@@ -23,6 +24,7 @@ init =
   { todoDoneListPair = ItemListPair.init
   , reminderField = ""
   , reminderDate = "2015-01-01"
+  , addReminderVisibility = False
   }
 
 getSelectedItemList : ItemListPair.Model -> Bool
@@ -49,6 +51,7 @@ type Action = TodoDoneListPair ItemListPair.Action
             | SaveContent String
             | SaveDate String
             | KeyPress Bool (Set.Set (Char.KeyCode))
+            | ToggleAddReminder
 
 update : Action -> Model -> Model
 update action model =
@@ -151,6 +154,16 @@ update action model =
                                                       in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
                                                in ItemListPair.update ItemListPair.SelectPrevious updatedPair }
 
+          -- "v" has keycode 68
+          -- hotkey to toggle the visibility of ‘done’ items
+          else if Set.member 86 keyCodes
+          then { model | todoDoneListPair = ItemListPair.update ItemListPair.ToggleVisibilityDone model.todoDoneListPair }
+
+          -- "r" has keycode 68
+          -- hotkey to toggle the visibility of ‘done’ items
+          else if Set.member 82 keyCodes
+          then update ToggleAddReminder model
+
           else { model | todoDoneListPair = let (currentId, _) = getSelectedItem model.todoDoneListPair
                                             in let updatedPair = let newPair = ItemListPair.update (ItemListPair.TodoList ItemList.SortNewWithPin) model.todoDoneListPair
                                                                  in ItemListPair.update (ItemListPair.DoneList ItemList.SortNewWithPin) newPair
@@ -173,6 +186,7 @@ update action model =
                                                        (newSelectedId, _) = getSelectedItem updatedPair
                                                    in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair }
 
+    ToggleAddReminder -> { model | addReminderVisibility = not model.addReminderVisibility}
 
 -- VIEW
 
@@ -184,22 +198,26 @@ view address model =
       ]
       [ Html.div []
         [ ItemListPair.view (Signal.forwardTo address TodoDoneListPair) (model.todoDoneListPair) ]
-      , Html.p [] []
-      , Html.h1 [] [Html.text "Reminder"]
-      , Html.input
-          [ placeholder "New Reminder"
-            , on "input" targetValue (\str -> Signal.message address (SaveContent str))
-            , type' "text"
-            , value model.reminderField
-            , onEnter address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))
-          ] []
-      , Html.input
-          [ type' "date"
-            , on "input" targetValue (\date -> Signal.message address (SaveDate date))
-            , value model.reminderDate
-            , onEnter address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))
-          ] []
-      , Html.button [ onClick address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))] [ Html.text "Add" ]
+        , Html.p [] []
+        , if not model.addReminderVisibility
+          then Html.p [] []
+          else Html.div []
+                [ Html.h1 [] [Html.text "Reminder"]
+                , Html.input
+                    [ placeholder "New Reminder"
+                      , on "input" targetValue (\str -> Signal.message address (SaveContent str))
+                      , type' "text"
+                      , value model.reminderField
+                      , onEnter address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))
+                    ] []
+                , Html.input
+                    [ type' "date"
+                      , on "input" targetValue (\date -> Signal.message address (SaveDate date))
+                      , value model.reminderDate
+                      , onEnter address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))
+                    ] []
+                , Html.button [ onClick address (TodoDoneListPair (ItemListPair.TodoList (ItemList.AddNew (Item.newReminder model.reminderField model.reminderDate))))] [ Html.text "Add" ]
+                ]
       ]
 
 

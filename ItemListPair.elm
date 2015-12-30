@@ -2,6 +2,7 @@ module ItemListPair where
 
 import Signal
 import Html exposing ( Html )
+import Html.Attributes as A
 import ItemList
 import Item
 
@@ -9,6 +10,7 @@ type alias Model =
   { todoList : ItemList.Model
   , doneList : ItemList.Model
   , selected : Int
+  , visibilityDone : Bool
   }
 
 init : Model
@@ -17,6 +19,7 @@ init =
                in ItemList.update (ItemList.SubAction 0 Item.ToggleSelect) initTodoList
   , doneList = ItemList.initEmpty
   , selected = 0
+  , visibilityDone = False
   }
 
 findItemWithId : ItemList.Id -> List (ItemList.Id, Item.Model) -> Item.Model
@@ -73,6 +76,7 @@ type Action = TodoList ItemList.Action
             | DoneList ItemList.Action
             | SelectNext
             | SelectPrevious
+            | ToggleVisibilityDone
 
 update : Action -> Model -> Model
 update action model =
@@ -101,7 +105,10 @@ update action model =
 -}
             Item.ToggleDone -> { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
                                                     in ItemList.update (ItemList.AddItem id (findItemWithId id (updatedTodoList.items))) model.doneList,
-                                         todoList = ItemList.update (ItemList.Remove id) model.todoList }
+                                         todoList = ItemList.update (ItemList.Remove id) model.todoList,
+                                         visibilityDone = if List.isEmpty (model.doneList).items
+                                                          then True
+                                                          else model.visibilityDone }
             -- Truncate or disabletruncate just updates the item in this list
             _ -> { model | todoList = ItemList.update subAction model.todoList }
         -- Only the subaction add is possible when a new reminder is added
@@ -131,7 +138,10 @@ update action model =
 -}
             Item.ToggleDone -> { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
                                                     in ItemList.update (ItemList.AddItem id (findItemWithId id updatedDoneList.items)) model.todoList,
-                                         doneList = ItemList.update (ItemList.Remove id) model.doneList }
+                                         doneList = ItemList.update (ItemList.Remove id) model.doneList,
+                                         visibilityDone = if List.length ((model.doneList).items) == 1
+                                                          then False
+                                                          else model.visibilityDone }
 
             -- Truncate or disabletruncate just updates the item in this list
             _ -> { model | doneList = ItemList.update subAction model.doneList }
@@ -145,6 +155,9 @@ update action model =
                                            in if model.selected%totalLength == 0
                                               then (totalLength - 1)
                                               else (model.selected - 1)%totalLength}
+
+    ToggleVisibilityDone -> { model | visibilityDone = not model.visibilityDone}
+
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
@@ -157,9 +170,13 @@ view address model =
           , ItemList.view (Signal.forwardTo address TodoList) (model.todoList)
         ]
       , Html.div []
-        [ if List.length ((model.doneList).items) == 0
+--        [ if List.length ((model.doneList).items) == 0
+        [ if not model.visibilityDone
           then Html.p [] []
-          else Html.h1 [] [Html.text "Done"]
-          , ItemList.view (Signal.forwardTo address DoneList) (model.doneList)
+          else Html.div []
+               [ Html.h1 [] [Html.text "Done"]
+               , Html.div [ A.style [("opacity", "0.5")]]
+               [ ItemList.view (Signal.forwardTo address DoneList) (model.doneList) ]
+               ]
         ]
       ]
