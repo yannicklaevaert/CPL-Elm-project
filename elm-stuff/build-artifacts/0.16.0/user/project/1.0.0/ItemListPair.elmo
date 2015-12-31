@@ -78,7 +78,9 @@ Elm.ItemListPair.make = function (_elm) {
       model.selected + 1,
       totalLength),
       $List.length(model.todoList.items)) > -1 ? A2($ItemList.getItem,
-      model.selected + 1 - $List.length(model.todoList.items),
+      A2($Basics._op["%"],
+      model.selected + 1,
+      totalLength) - $List.length(model.todoList.items),
       model.doneList) : A2($ItemList.getItem,
       A2($Basics._op["%"],model.selected + 1,totalLength),
       model.todoList);

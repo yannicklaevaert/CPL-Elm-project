@@ -5,6 +5,7 @@ import Html exposing ( Html )
 import Html.Attributes as A
 import ItemList
 import Item
+import Debug
 
 type alias Model =
   { todoList : ItemList.Model
@@ -76,7 +77,7 @@ getNextItemList model = let totalLength = (List.length (model.todoList).items + 
 getNextItem : Model -> (ItemList.Id, Item.Model)
 getNextItem model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
                     in if (model.selected+1)%totalLength >= List.length (model.todoList).items
-                       then ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items)) (model.doneList)
+                       then ItemList.getItem ((model.selected + 1)%totalLength - (List.length (model.todoList).items)) (model.doneList)
                        else ItemList.getItem ((model.selected + 1)%totalLength) (model.todoList)
 
 getNextSelected : Model -> Int
@@ -203,7 +204,7 @@ update action model =
                                              else updatedTodoList,
                             doneList = let (nextId, _) = getNextItem model
                                            (currentId, _) = getSelectedItem model
-                                       in let updatedDoneList =
+                                      in let updatedDoneList =
                                             if getSelectedItemList model
                                             then model.doneList
                                             else ItemList.update (ItemList.SubAction currentId Item.ToggleSelect) model.doneList
