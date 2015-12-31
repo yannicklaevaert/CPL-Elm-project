@@ -96,7 +96,9 @@ update action model =
            -- "p" has keycode 80
     -- TODO KLOPT HELEMAAL NOG NIET -> selecteditem moet nog wijzigen
              else if Set.member 80 keyCodes
-             then { model | todoDoneListPair = let (currentId, _) = getSelectedItem model.todoDoneListPair
+             then { model | todoDoneListPair = ItemListPair.update ItemListPair.TogglePin model.todoDoneListPair }
+
+{-                                               let (currentId, _) = getSelectedItem model.todoDoneListPair
                                                in let updatedPair =
                                                     if getSelectedItemList model.todoDoneListPair
                                                     then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.TogglePin)) model.todoDoneListPair
@@ -108,15 +110,18 @@ update action model =
                                                      else let updatedNewPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
                                                               (newSelectedId, _) = getSelectedItem updatedPair
                                                           in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair }
+-}
+
            -- "x" has keycode 88
     -- TODO KLOPT HELEMAAL NOG NIET -> selecteditem moet nog wijzigen
              else if Set.member 88 keyCodes
              then { model | todoDoneListPair = let (currentId, _) = getSelectedItem model.todoDoneListPair
+                                                   selectedInTodo = getSelectedItemList model.todoDoneListPair
                                                in let updatedPair =
-                                                    if getSelectedItemList model.todoDoneListPair
+                                                    if selectedInTodo
                                                     then ItemListPair.update (ItemListPair.TodoList (ItemList.SubAction currentId Item.ToggleDone)) model.todoDoneListPair
                                                     else ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleDone)) model.todoDoneListPair
-                                                  in if getSelectedItemList model.todoDoneListPair
+                                                  in if selectedInTodo
                                                      then let updatedNewPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
                                                               (newSelectedId, _) = getSelectedItem updatedPair
                                                           in if getSelectedItemList updatedNewPair
@@ -131,7 +136,8 @@ update action model =
            -- "j" has keycode 74
     -- TODO KLOPT HELEMAAL NOG NIET
              else if Set.member 74 keyCodes
-             then { model | todoDoneListPair = let (nextId, _) = getNextItem model.todoDoneListPair
+             then { model | todoDoneListPair = ItemListPair.update ItemListPair.SelectNext model.todoDoneListPair }
+{-                                               let (nextId, _) = getNextItem model.todoDoneListPair
                                                    (currentId, _) = getSelectedItem model.todoDoneListPair
                                                in let updatedPair =
                                                     if getNextItemList model.todoDoneListPair && getSelectedItemList model.todoDoneListPair
@@ -146,10 +152,13 @@ update action model =
                                                     else let newPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction nextId Item.ToggleSelect)) model.todoDoneListPair
                                                          in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
                                                   in ItemListPair.update ItemListPair.SelectNext updatedPair }
+-}
+
            -- "k" has keycode 75
     -- TODO KLOPT HELEMAAL NOG NIET
             else if Set.member 75 keyCodes
-            then { model | todoDoneListPair = let (previousId, _) = getPreviousItem model.todoDoneListPair
+            then { model | todoDoneListPair = ItemListPair.update ItemListPair.SelectPrevious model.todoDoneListPair }
+{-                                              let (previousId, _) = getPreviousItem model.todoDoneListPair
                                                   (currentId, _) = getSelectedItem model.todoDoneListPair
                                               in let updatedPair =
                                                    if getPreviousItemList model.todoDoneListPair && getSelectedItemList model.todoDoneListPair
@@ -164,6 +173,7 @@ update action model =
                                                    else let newPair = ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction previousId Item.ToggleSelect)) model.todoDoneListPair
                                                         in ItemListPair.update (ItemListPair.DoneList (ItemList.SubAction currentId Item.ToggleSelect)) newPair
                                                  in ItemListPair.update ItemListPair.SelectPrevious updatedPair }
+-}
 
            -- "v" has keycode 68
            -- hotkey to toggle the visibility of ‘done’ items
