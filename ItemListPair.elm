@@ -70,6 +70,21 @@ getNextItem model = let totalLength = (List.length (model.todoList).items + List
                        then ItemList.getItem (model.selected + 1 - (List.length (model.todoList).items)) (model.doneList)
                        else ItemList.getItem ((model.selected + 1)%totalLength) (model.todoList)
 
+getNextSelected : Model -> Int
+getNextSelected model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                        in (model.selected+1)%totalLength
+
+getPreviousSelected : Model -> Int
+getPreviousSelected model = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
+                            in if (model.selected%totalLength == 0)
+                               then totalLength - 1
+                               else (model.selected-1)%totalLength
+
+getItem : Int -> Model -> (ItemList.Id, Item.Model)
+getItem n model = if n < List.length (model.todoList).items
+                  then ItemList.getItem n (model.todoList)
+                  else ItemList.getItem n (model.doneList)
+
 -- UPDATE
 
 type Action = TodoList ItemList.Action
@@ -78,6 +93,7 @@ type Action = TodoList ItemList.Action
             | SelectPrevious
             | ToggleVisibilityDone
             | TogglePin
+            | ToggleDone
 
 update : Action -> Model -> Model
 update action model =
@@ -88,36 +104,32 @@ update action model =
           case subSubAction of
             -- TODO
             Item.TogglePin -> { model | todoList = let changedTodoList = ItemList.update subAction model.todoList
-                                                       (currentId, _) = getSelectedItem model
-                                                       (newSelectedId, _) = getSelectedItem model
-                                                       updatedTodoList = ItemList.update (ItemList.SubAction currentId Item.ToggleSelect) changedTodoList
-                                                       newTodoList = ItemList.update (ItemList.SubAction newSelectedId Item.ToggleSelect) updatedTodoList
-                                                   in ItemList.update ItemList.SortNewWithPin newTodoList }
-{-                                                   let updatedTodoList = ItemList.update subAction model.todoList
-                                                   in { items = (ItemList.update ItemList.SortNewWithPin updatedTodoList).items,
-                                                        nextItemId = (model.todoList).nextItemId }}
--}
-
-            -- TODO Not totally correct, sometimes button is changed to undo, sometimes it stays mark as done
---            Item.MarkAsDone -> { model | doneList = let tempDoneList = (ItemList.update (ItemList.Add (help id ((model.todoList).items))) model.doneList)
---                                                    in ItemList.update subAction tempDoneList,
---                                         todoList = ItemList.update (ItemList.Remove id) model.todoList }
+                                                       updatedTodoList = ItemList.update ItemList.SortNewWithPin changedTodoList
+                                                       (newSelectedId, _) = ItemList.getItem model.selected updatedTodoList
+                                                       adaptedTodoList = ItemList.update (ItemList.SubAction id Item.ToggleSelect) updatedTodoList
+                                                   in ItemList.update (ItemList.SubAction newSelectedId Item.ToggleSelect) adaptedTodoList }
 
 
-{-            -- Think it is correct now
-            -- When marked as done, item is updated in todolist, added to donelist and removed from todolist
-            Item.MarkAsDone -> { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
-                                                    in ItemList.update (ItemList.Add (help id (updatedTodoList.items))) model.doneList,
-                                         todoList = ItemList.update (ItemList.Remove id) model.todoList }
-            -- Not Possible because when marked done the item is not in this list
-            Item.MarkUndone -> model
--}
-            Item.ToggleDone -> { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
+            Item.ToggleDone -> let updatedPair = { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
+                                                                      in ItemList.update (ItemList.AddItem id (findItemWithId id (updatedTodoList.items))) model.doneList,
+                                                           todoList = ItemList.update (ItemList.Remove id) model.todoList,
+                                                           visibilityDone = if List.isEmpty (model.doneList).items
+                                                                            then True
+                                                                            else model.visibilityDone }
+                               in let updatedNewPair = update (DoneList (ItemList.SubAction id Item.ToggleSelect)) updatedPair
+                                      (newSelectedId, _) = getItem (getPreviousSelected model) updatedNewPair
+                                  in if getSelectedItemList updatedNewPair
+                                     then update (TodoList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+                                     else update (DoneList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+
+{-                              { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
                                                     in ItemList.update (ItemList.AddItem id (findItemWithId id (updatedTodoList.items))) model.doneList,
                                          todoList = ItemList.update (ItemList.Remove id) model.todoList,
                                          visibilityDone = if List.isEmpty (model.doneList).items
                                                           then True
                                                           else model.visibilityDone }
+-}
+
             -- Truncate or disabletruncate just updates the item in this list
             _ -> { model | todoList = ItemList.update subAction model.todoList }
         -- Only the subaction add is possible when a new reminder is added
@@ -128,39 +140,36 @@ update action model =
         ItemList.SubAction id subSubAction ->
           case subSubAction of
             -- TODO
-            Item.TogglePin -> { model | doneList = let changedDoneList = ItemList.update subAction model.doneList
-                                                       (currentId, _) = getSelectedItem model
-                                                       (newSelectedId, _) = getSelectedItem model
-                                                       updatedDoneList = ItemList.update (ItemList.SubAction currentId Item.ToggleSelect) changedDoneList
-                                                       newDoneList = ItemList.update (ItemList.SubAction newSelectedId Item.ToggleSelect) updatedDoneList
-                                                   in ItemList.update ItemList.SortNewWithPin newDoneList }
-
-{-                                                   let updatedDoneList = ItemList.update subAction model.doneList
-                                                   in { items = (ItemList.update ItemList.SortNewWithPin updatedDoneList).items,
-                                                        nextItemId = (model.doneList).nextItemId }}
--}
+            Item.TogglePin -> { model | doneList = let changedDoneList = ItemList.update subAction model.todoList
+                                                       updatedDoneList = ItemList.update ItemList.SortNewWithPin changedDoneList
+                                                       (newSelectedId, _) = ItemList.getItem model.selected updatedDoneList
+                                                       adaptedDoneList = ItemList.update (ItemList.SubAction id Item.ToggleSelect) updatedDoneList
+                                                   in ItemList.update (ItemList.SubAction newSelectedId Item.ToggleSelect) adaptedDoneList }
 
 
-            -- TODO Not totally correct, sometimes button is changed to undo, sometimes it stays mark as done
---            Item.MarkUndone -> { model | todoList = let tempTodoList = (ItemList.update (ItemList.Add (help id ((model.doneList).items))) model.todoList)
---                                                    in ItemList.update subAction tempTodoList,
---                                         doneList = ItemList.update (ItemList.Remove id) model.doneList }
+            Item.ToggleDone -> let updatedPair = { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
+                                                                      in ItemList.update (ItemList.AddItem id (findItemWithId id updatedDoneList.items)) model.todoList,
+                                                           doneList = ItemList.update (ItemList.Remove id) model.doneList,
+                                                           visibilityDone = if List.length ((model.doneList).items) == 1
+                                                                            then False
+                                                                            else model.visibilityDone }
+                               in let updatedNewPair = update (TodoList (ItemList.SubAction id Item.ToggleSelect)) updatedPair
+                                      (newSelectedId, _) = getItem (getNextSelected model) updatedNewPair
+                                  in if getSelectedItemList updatedNewPair
+                                      then update (TodoList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+                                      else update (DoneList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
 
-
-{-            -- Think it is correct now
-            -- Not Possible because when marked undone the item is not in this list
-            Item.MarkAsDone -> model
-            -- When marked as done, item is updated in todolist, added to donelist and removed from todolist
-            Item.MarkUndone -> { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
-                                                    in ItemList.update (ItemList.Add (help id (updatedDoneList.items))) model.todoList,
-                                         doneList = ItemList.update (ItemList.Remove id) model.doneList }
--}
-            Item.ToggleDone -> { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
+{-                               { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
                                                     in ItemList.update (ItemList.AddItem id (findItemWithId id updatedDoneList.items)) model.todoList,
                                          doneList = ItemList.update (ItemList.Remove id) model.doneList,
                                          visibilityDone = if List.length ((model.doneList).items) == 1
                                                           then False
                                                           else model.visibilityDone }
+
+-}
+
+
+
 
             -- Truncate or disabletruncate just updates the item in this list
             _ -> { model | doneList = ItemList.update subAction model.doneList }
@@ -218,7 +227,24 @@ update action model =
                     then update (TodoList (ItemList.SubAction currentId Item.TogglePin)) model
                     else update (DoneList (ItemList.SubAction currentId Item.TogglePin)) model
 
+    ToggleDone -> let (currentId, _) = getSelectedItem model
+                  in if getSelectedItemList model
+                     then update (TodoList (ItemList.SubAction currentId Item.ToggleDone)) model
+                     else update (DoneList (ItemList.SubAction currentId Item.ToggleDone)) model
 
+{-                  in if getSelectedItemList model
+                     then let updatedNewPair = update (DoneList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
+                              (newSelectedId, _) = getItem (getPreviousSelected model) updatedNewPair
+                          in if getSelectedItemList updatedNewPair
+                             then update (TodoList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+                             else update (DoneList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+                     else let updatedNewPair = update (TodoList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
+                              (newSelectedId, _) = getItem (getNextSelected model) updatedNewPair
+                          in if getSelectedItemList updatedNewPair
+                              then update (TodoList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+                              else update (DoneList (ItemList.SubAction newSelectedId Item.ToggleSelect)) updatedNewPair
+
+-}
 
 
 

@@ -87,7 +87,7 @@ view address model =
         [ if model.selected
           then A.style [("border-left-style", "double"),
                         ("border-left-width", "thick"),
-                        ("border-left-color", "rgb(170, 255, 255)")
+                        ("border-left-color", "rgb(255, 165, 0)")
                        ]
           else A.style [("border-left-style", "solid"),
                         ("border-left-width", "0px")]
@@ -118,7 +118,7 @@ view address model =
         [ if model.selected
           then A.style [("border-left-style", "double"),
                         ("border-left-width", "thick"),
-                        ("border-left-color", "rgb(170, 255, 255)")
+                        ("border-left-color", "rgb(255, 165, 0)")
                        ]
           else A.style [("border-left-style", "solid"),
                         ("border-left-width", "0px")]
