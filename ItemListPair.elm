@@ -28,6 +28,15 @@ findItemWithId id list =
     (x, y)::rest -> if x==id then y else findItemWithId id rest
     [] -> Item.dummyItem
 
+findListWithItem : ItemList.Id -> Model -> Bool
+findListWithItem iId model =
+    let todo = model.todoList
+        done = model.doneList
+    in if (findItemWithId iId todo.items) /= Item.dummyItem
+       then True
+       else False
+    -- assumption the id is in one of the two lists
+
 getSelectedItemList : Model -> Bool
 getSelectedItemList model = if model.selected >= List.length (model.todoList).items
                             then False -- selected item in doneList
@@ -104,19 +113,23 @@ update action model =
         ItemList.SubAction id subSubAction ->
           case subSubAction of
 
-            Item.TogglePin -> { model | todoList = let changedTodoList = ItemList.update subAction model.todoList
+            Item.TogglePin -> { model | todoList = let (currentId, _) = getItem model.selected model
+                                                       changedTodoList = ItemList.update subAction model.todoList
                                                        updatedTodoList = ItemList.update ItemList.SortNewWithPin changedTodoList
                                                        (newSelectedId, _) = ItemList.getItem model.selected updatedTodoList
-                                                       adaptedTodoList = ItemList.update (ItemList.SubAction id Item.ToggleSelect) updatedTodoList
+                                                       adaptedTodoList = ItemList.update (ItemList.SubAction currentId Item.ToggleSelect) updatedTodoList
                                                    in ItemList.update (ItemList.SubAction newSelectedId Item.ToggleSelect) adaptedTodoList }
 
-            Item.ToggleDone -> let updatedPair = { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
+            Item.ToggleDone -> let (currentId, _) = getItem model.selected model
+                                   updatedPair = { model | doneList = let updatedTodoList = ItemList.update subAction model.todoList
                                                                       in ItemList.update (ItemList.AddItem id (findItemWithId id (updatedTodoList.items))) model.doneList,
                                                            todoList = ItemList.update (ItemList.Remove id) model.todoList,
                                                            visibilityDone = if List.isEmpty (model.doneList).items
                                                                             then True
                                                                             else model.visibilityDone }
-                               in let updatedNewPair = update (DoneList (ItemList.SubAction id Item.ToggleSelect)) updatedPair
+                               in let updatedNewPair = if findListWithItem currentId updatedPair
+                                                       then update (TodoList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
+                                                       else update (DoneList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
                                       previousSelected = getPreviousSelected updatedPair
                                       (newSelectedId, _) = getItem previousSelected updatedNewPair
                                       adaptedPair = if previousSelected < List.length (updatedNewPair.todoList).items
@@ -145,20 +158,23 @@ update action model =
       case subAction of
         ItemList.SubAction id subSubAction ->
           case subSubAction of
-            -- TODO
-            Item.TogglePin -> { model | doneList = let changedDoneList = ItemList.update subAction model.todoList
+            Item.TogglePin -> { model | doneList = let (currentId, _) = getItem model.selected model
+                                                       changedDoneList = ItemList.update subAction model.doneList
                                                        updatedDoneList = ItemList.update ItemList.SortNewWithPin changedDoneList
                                                        (newSelectedId, _) = ItemList.getItem model.selected updatedDoneList
-                                                       adaptedDoneList = ItemList.update (ItemList.SubAction id Item.ToggleSelect) updatedDoneList
+                                                       adaptedDoneList = ItemList.update (ItemList.SubAction currentId Item.ToggleSelect) updatedDoneList
                                                    in ItemList.update (ItemList.SubAction newSelectedId Item.ToggleSelect) adaptedDoneList }
 
-            Item.ToggleDone -> let updatedPair = { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
+            Item.ToggleDone -> let (currentId, _) = getItem model.selected model
+                                   updatedPair = { model | todoList = let updatedDoneList = ItemList.update subAction model.doneList
                                                                       in ItemList.update (ItemList.AddItem id (findItemWithId id updatedDoneList.items)) model.todoList,
                                                            doneList = ItemList.update (ItemList.Remove id) model.doneList,
                                                            visibilityDone = if List.length ((model.doneList).items) == 1
                                                                             then False
                                                                             else model.visibilityDone }
-                               in let updatedNewPair = update (TodoList (ItemList.SubAction id Item.ToggleSelect)) updatedPair
+                               in let updatedNewPair = if findListWithItem currentId updatedPair
+                                                       then update (TodoList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
+                                                       else update (DoneList (ItemList.SubAction currentId Item.ToggleSelect)) updatedPair
                                       nextSelected = getNextSelected updatedPair
                                       (newSelectedId, _) = getItem nextSelected updatedNewPair
                                       adaptedPair = if nextSelected < List.length (updatedNewPair.todoList).items
@@ -195,7 +211,7 @@ update action model =
                                              then updatedDoneList
                                              else ItemList.update (ItemList.SubAction nextId Item.ToggleSelect) updatedDoneList,
                             selected = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
-                                                               in (model.selected + 1)%totalLength }
+                                       in (model.selected + 1)%totalLength }
 
 
     SelectPrevious -> { model | todoList = let (previousId, _) = getPreviousItem model
@@ -217,9 +233,9 @@ update action model =
                                                  then updatedDoneList
                                                  else ItemList.update (ItemList.SubAction previousId Item.ToggleSelect) updatedDoneList,
                                 selected = let totalLength = (List.length (model.todoList).items + List.length (model.doneList).items)
-                                                                       in if model.selected%totalLength == 0
-                                                                          then (totalLength - 1)
-                                                                          else (model.selected - 1)%totalLength }
+                                           in if model.selected%totalLength == 0
+                                              then (totalLength - 1)
+                                              else (model.selected - 1)%totalLength }
 
 
     ToggleVisibilityDone -> { model | visibilityDone = not model.visibilityDone}

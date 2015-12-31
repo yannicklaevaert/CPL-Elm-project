@@ -52,7 +52,6 @@ type Action
     | ToggleSelect
 
 
-
 update : Action -> Model -> Model
 update action model =
   case action of
@@ -116,7 +115,6 @@ view address model =
             , Html.p [] [Html.text <| "date: " ++ reminder.created]
           ]
         ]
-
 
     EmailItem email ->
         Html.div

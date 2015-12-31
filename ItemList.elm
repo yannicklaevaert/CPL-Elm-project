@@ -126,18 +126,26 @@ type Action = SubAction Id Item.Action
 update : Action -> Model -> Model
 update action model =
   case action of
+
     AddNew item ->
       addNewItem item model
+
     AddItem id item ->
       addItem id item model
+
     Remove id ->
       removeItem id model
+
     SubAction id action ->
       updateItem (Item.update action) id model
+
     SortOldWithoutPin ->
       sortOldWithoutPin model
+
     SortNewWithPin ->
       sortNewWithPin model
+
+-- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
