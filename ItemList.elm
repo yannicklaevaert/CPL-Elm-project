@@ -122,7 +122,6 @@ type Action = SubAction Id Item.Action
               | Remove Id
               | SortOldWithoutPin
               | SortNewWithPin
-              | DoubleSubAction Id Item.Action Id Item.Action
 
 update : Action -> Model -> Model
 update action model =
@@ -139,10 +138,6 @@ update action model =
       sortOldWithoutPin model
     SortNewWithPin ->
       sortNewWithPin model
-    DoubleSubAction firstId firstAction secondId secondAction ->
-      let updatedModel = updateItem (Item.update firstAction) firstId model
-      in updateItem (Item.update secondAction) secondId updatedModel
-
 
 view : Signal.Address Action -> Model -> Html
 view address model =

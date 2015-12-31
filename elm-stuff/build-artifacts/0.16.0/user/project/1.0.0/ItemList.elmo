@@ -14,9 +14,6 @@ Elm.ItemList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Static = Elm.Static.make(_elm);
    var _op = {};
-   var DoubleSubAction = F4(function (a,b,c,d) {
-      return {ctor: "DoubleSubAction",_0: a,_1: b,_2: c,_3: d};
-   });
    var SortNewWithPin = {ctor: "SortNewWithPin"};
    var SortOldWithoutPin = {ctor: "SortOldWithoutPin"};
    var Remove = function (a) {    return {ctor: "Remove",_0: a};};
@@ -203,15 +200,7 @@ Elm.ItemList.make = function (_elm) {
            _p22._0,
            model);
          case "SortOldWithoutPin": return sortOldWithoutPin(model);
-         case "SortNewWithPin": return sortNewWithPin(model);
-         default: var updatedModel = A3(updateItem,
-           $Item.update(_p22._1),
-           _p22._0,
-           model);
-           return A3(updateItem,
-           $Item.update(_p22._3),
-           _p22._2,
-           updatedModel);}
+         default: return sortNewWithPin(model);}
    });
    var sortItems = function (unsorted) {
       var sorter = function (item) {
@@ -277,7 +266,6 @@ Elm.ItemList.make = function (_elm) {
                                  ,Remove: Remove
                                  ,SortOldWithoutPin: SortOldWithoutPin
                                  ,SortNewWithPin: SortNewWithPin
-                                 ,DoubleSubAction: DoubleSubAction
                                  ,update: update
                                  ,view: view};
 };
