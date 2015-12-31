@@ -52,7 +52,6 @@ type Action
     | ToggleSelect
 
 
-
 update : Action -> Model -> Model
 update action model =
   case action of
@@ -87,74 +86,83 @@ view address model =
         [ if model.selected
           then A.style [("border-left-style", "double"),
                         ("border-left-width", "thick"),
-                        ("border-left-color", "rgb(170, 255, 255)")
-                       ]
+                        ("border-left-color", "rgb(255, 165, 0)")]
           else A.style [("border-left-style", "solid"),
                         ("border-left-width", "0px")]
         ]
-        [ Html.p [] [Html.text reminder.body]
-        , Html.p []
-          [ if model.done == False
-            then Html.button
-                [ E.onClick address ToggleDone ]
-                [ Html.text "Mark as Done" ]
-            else Html.button
-                [ E.onClick address ToggleDone ]
-                [ Html.text "Undo" ]
-          , if model.pinned == False
-            then Html.button
-                [ E.onClick address TogglePin ]
-                [ Html.text "Pin" ]
-            else Html.button
-                [ E.onClick address TogglePin ]
-                [ Html.text "Unpin" ]
+        [ Html.div
+          [ if model.pinned
+            then A.style [("background-color", "rgb(200, 200, 200)")]
+            else A.style [("background-color", "rgb(255, 255, 255)")]
           ]
-          , Html.p [] [Html.text <| "date: " ++ reminder.created]
+          [ Html.p [] [Html.text reminder.body]
+          , Html.p []
+            [ if model.done == False
+              then Html.button
+                  [ E.onClick address ToggleDone ]
+                  [ Html.text "Mark as Done" ]
+              else Html.button
+                  [ E.onClick address ToggleDone ]
+                  [ Html.text "Undo" ]
+            , if model.pinned == False
+              then Html.button
+                  [ E.onClick address TogglePin ]
+                  [ Html.text "Pin" ]
+              else Html.button
+                  [ E.onClick address TogglePin ]
+                  [ Html.text "Unpin" ]
+            ]
+            , Html.p [] [Html.text <| "date: " ++ reminder.created]
+          ]
         ]
-
 
     EmailItem email ->
         Html.div
         [ if model.selected
           then A.style [("border-left-style", "double"),
                         ("border-left-width", "thick"),
-                        ("border-left-color", "rgb(170, 255, 255)")
-                       ]
+                        ("border-left-color", "rgb(255, 165, 0)")]
           else A.style [("border-left-style", "solid"),
                         ("border-left-width", "0px")]
         ]
-        [ Html.p [] [Html.text <| email.title ++ " | " ++ email.from ++ " says:"]
-        , let body =
-            case model.truncated of
-              False -> email.body
-              True -> if String.length email.body >= 200
-                      then String.append (String.fromList (List.take 200 (String.toList (email.body)))) "..."
-                      else email.body
-          in Html.p [] [ Html.text body]
-        , Html.p []
-          [ if String.length email.body >= 200
-            then (if model.truncated == False
-                 then Html.button
-                    [ E.onClick address ToggleTruncate ]
-                    [ Html.text "Less" ]
-                 else Html.button
-                    [ E.onClick address ToggleTruncate ]
-                    [ Html.text "More" ])
-            else Html.p [] []
-          , if model.done == False
-            then Html.button
-                  [ E.onClick address ToggleDone ]
-                  [ Html.text "Mark as Done" ]
-            else Html.button
-                  [ E.onClick address ToggleDone ]
-                  [ Html.text "Undo" ]
-          , if model.pinned == False
-            then Html.button
-                  [ E.onClick address TogglePin ]
-                  [ Html.text "Pin" ]
-            else Html.button
-                  [ E.onClick address TogglePin ]
-                  [ Html.text "Unpin" ]
+        [ Html.div
+          [ if model.pinned
+            then A.style [("background-color", "rgb(200, 200, 200)")]
+            else A.style [("background-color", "rgb(255, 255, 255)")]
           ]
+          [ Html.p [] [Html.text <| email.title ++ " | " ++ email.from ++ " says:"]
+          , let body =
+              case model.truncated of
+                False -> email.body
+                True -> if String.length email.body >= 200
+                        then String.append (String.fromList (List.take 200 (String.toList (email.body)))) "..."
+                        else email.body
+            in Html.p [] [ Html.text body]
+          , Html.p []
+            [ if String.length email.body >= 200
+              then (if model.truncated == False
+                   then Html.button
+                      [ E.onClick address ToggleTruncate ]
+                      [ Html.text "Less" ]
+                   else Html.button
+                      [ E.onClick address ToggleTruncate ]
+                      [ Html.text "More" ])
+              else Html.p [] []
+            , if model.done == False
+              then Html.button
+                    [ E.onClick address ToggleDone ]
+                    [ Html.text "Mark as Done" ]
+              else Html.button
+                    [ E.onClick address ToggleDone ]
+                    [ Html.text "Undo" ]
+            , if model.pinned == False
+              then Html.button
+                    [ E.onClick address TogglePin ]
+                    [ Html.text "Pin" ]
+              else Html.button
+                    [ E.onClick address TogglePin ]
+                    [ Html.text "Unpin" ]
+            ]
           , Html.p [] [Html.text <| "date: " ++ email.date]
           ]
+        ]
